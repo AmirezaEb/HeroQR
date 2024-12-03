@@ -1,10 +1,13 @@
 {
-    "name": "amirrezaeb/heroqr",
-    "description": "Coming soon",
+    "name": "heroexpert/heroqr", 
+    "description": "A powerful QR Code management library for PHP",
+    "type": "library",
+    "license": "MIT",
     "authors": [
         {
-            "name": "Amirreza Ebrahimi",
-            "email": "aabrahimi1718@gmail.com"
+            "name": "Amirreza",
+            "email": "aabrahimi1718@gmail.com",
+            "role": "Developer"
         }
     ],
     "autoload": {
