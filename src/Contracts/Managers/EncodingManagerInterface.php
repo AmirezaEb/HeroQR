@@ -1,6 +1,6 @@
 <?php
 
-namespace HeroQR\Contracts\services;
+namespace HeroQR\Contracts\Managers;
 
 use Endroid\QrCode\Encoding\EncodingInterface;
 

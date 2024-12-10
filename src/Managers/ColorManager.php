@@ -1,10 +1,10 @@
 <?php
 
-namespace HeroQR\Services;
+namespace HeroQR\Managers;
 
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Color\ColorInterface;
-use HeroQR\Contracts\services\ColorManagerInterface;
+use HeroQR\Contracts\Managers\ColorManagerInterface;
 
 class ColorManager implements ColorManagerInterface
 {

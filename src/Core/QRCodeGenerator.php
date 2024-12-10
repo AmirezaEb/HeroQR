@@ -3,13 +3,14 @@
 namespace HeroQR\Core;
 
 use HeroQR\Contracts\QRCodeGeneratorInterface;
-use HeroQR\Services\ColorManager;
-use HeroQR\Services\LogoManager;
-use HeroQR\Services\LabelManager;
-use HeroQR\Services\EncodingManager;
+use HeroQR\Managers\ColorManager;
+use HeroQR\Managers\LogoManager;
+use HeroQR\Managers\LabelManager;
+use HeroQR\Managers\EncodingManager;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Matrix\Matrix;
 use Endroid\QrCode\Writer\WriterInterface;
+use HeroQR\DataTypes\DataType;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -17,7 +18,7 @@ use RuntimeException;
  * Class QRCodeGenerator
  * Handles the generation of QR codes with customizable options.
  */
-class QRCodeGenerator
+class QRCodeGenerator implements QrCodeGeneratorInterface
 {
     private $builder;
     private LabelManager $labelManager;
@@ -184,14 +185,44 @@ class QRCodeGenerator
      * @return self
      * @throws InvalidArgumentException If the data is empty.
      */
-    public function setData(string $data): self
+    public function setData(string $data, DataType $type = DataType::Text): self
     {
+        $class = $type->value;
+
+        if (!$class::validate($data)) {
+            throw new \InvalidArgumentException("Invalid data for type: " . $class::getType());
+        }
+
         if (empty(trim($data))) {
             throw new InvalidArgumentException('Data cannot be empty.');
         }
 
-        $this->data = htmlspecialchars($data);
+        $this->data = $this->dataSanitizer($data, $type);
         return $this;
+    }
+
+    /**
+     * Sanitizes and formats data based on the provided data type.
+     * 
+     * This method sanitizes the input data and adds the appropriate prefix or URL based on the data type.
+     * 
+     * @param string $data The raw data to sanitize and format.
+     * @param DataType $type The type of data (e.g., Email, Phone, Wifi, Location).
+     * @return string The sanitized and formatted data.
+     */
+    public function dataSanitizer(string $data, DataType $type)
+    {
+        $data = htmlspecialchars($data);
+
+        $extension = match ($type) {
+            DataType::Email => "mailto:{$data}",
+            DataType::Phone => "tel:{$data}",
+            DataType::Wifi => "$data",
+            DataType::Location => "https://www.google.com/maps?q=$data",
+            default => $data,
+        };
+
+        return $extension;
     }
 
     /**

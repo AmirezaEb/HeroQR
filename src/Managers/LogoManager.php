@@ -1,8 +1,8 @@
 <?php
 
-namespace HeroQR\Services;
+namespace HeroQR\Managers;
 
-use HeroQR\Contracts\services\LogoManagerInterface;
+use HeroQR\Contracts\Managers\LogoManagerInterface;
 use InvalidArgumentException;
 
 /**

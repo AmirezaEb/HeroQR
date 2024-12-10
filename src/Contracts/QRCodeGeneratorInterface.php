@@ -2,11 +2,19 @@
 
 namespace HeroQR\Contracts;
 
+use HeroQR\DataTypes\DataType;
+use HeroQR\Managers\LogoManager;
+use HeroQR\Managers\ColorManager;
+use HeroQR\Managers\EncodingManager;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Matrix\Matrix;
+use Endroid\QrCode\Writer\WriterInterface;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Interface QRCodeGeneratorInterface
- * Defines the contract for generating customizable QR codes.
+ * Defines the methods for generating QR codes with customizable options.
  */
 interface QRCodeGeneratorInterface
 {
@@ -14,86 +22,132 @@ interface QRCodeGeneratorInterface
      * Generate a QR code in the specified format.
      *
      * @param string $format The desired output format (e.g., 'png', 'svg').
-     * @return string The data URI of the generated QR code.
+     * @return self
      * @throws InvalidArgumentException If the format is invalid.
      */
-    public function generate(string $format): string;
+    public function generate(string $format): self;
 
     /**
-     * Set the data for the QR code.
+     * Get the matrix representation of the QR code.
+     *
+     * @return Matrix The matrix object representing the QR code.
+     * @throws RuntimeException If no QR code has been generated yet.
+     */
+    public function getMatrix(): Matrix;
+
+    /**
+     * Get the matrix as an array.
+     *
+     * @return array The QR code matrix represented as a 2D array.
+     * @throws RuntimeException If no QR code has been generated yet.
+     */
+    public function getMatrixAsArray(): array;
+
+    /**
+     * Get the QR code as a string.
+     *
+     * @return string The QR code as a string.
+     * @throws RuntimeException If no QR code has been generated yet.
+     */
+    public function getString(): string;
+
+    /**
+     * Get the QR code as a Data URI.
+     *
+     * @return string The QR code as a Data URI.
+     * @throws RuntimeException If no QR code has been generated yet.
+     */
+    public function getDataUri(): string;
+
+    /**
+     * Save the generated QR code to a file.
+     *
+     * @param string $path The path to save the QR code file.
+     * @return bool True if the file was saved successfully, false otherwise.
+     * @throws InvalidArgumentException If the format is unsupported.
+     * @throws RuntimeException If no QR code has been generated yet.
+     */
+    public function saveTo(string $path): bool;
+
+    /**
+     * Set the data to be encoded in the QR code.
      *
      * @param string $data The data to encode.
+     * @param DataType $type The type of the data (e.g., Email, Phone, Wifi, Location).
      * @return self
-     * @throws InvalidArgumentException If the data is empty.
+     * @throws InvalidArgumentException If the data is empty or invalid.
      */
-    public function setData(string $data): self;
+    public function setData(string $data, DataType $type): self;
 
     /**
      * Set the size of the QR code.
      *
-     * @param int $size The size in pixels.
+     * @param int $size The size of the QR code.
      * @return self
-     * @throws InvalidArgumentException If the size is not positive.
+     * @throws InvalidArgumentException If the size is not a positive integer.
      */
     public function setSize(int $size): self;
 
     /**
-     * Set the margin for the QR code.
+     * Set the margin around the QR code.
      *
-     * @param int $margin The margin in pixels.
+     * @param int $margin The margin size.
      * @return self
      * @throws InvalidArgumentException If the margin is negative.
      */
     public function setMargin(int $margin): self;
 
     /**
-     * Set the foreground color of the QR code.
+     * Set the color of the QR code foreground.
      *
-     * @param string $hexColor The hex color code.
+     * @param string $hexColor The hexadecimal color code.
      * @return self
+     * @throws InvalidArgumentException If the color format is invalid.
      */
     public function setColor(string $hexColor): self;
 
     /**
      * Set the background color of the QR code.
      *
-     * @param string $hexColor The hex color code.
+     * @param string $hexColor The hexadecimal color code.
      * @return self
+     * @throws InvalidArgumentException If the color format is invalid.
      */
     public function setBackgroundColor(string $hexColor): self;
 
     /**
-     * Set the logo for the QR code.
+     * Set the logo to be embedded in the QR code.
      *
-     * @param string $logoPath Path to the logo image.
-     * @param int $logoSize Width of the logo in pixels.
+     * @param string $logoPath The path to the logo file.
+     * @param int $logoSize The size of the logo.
      * @return self
-     * @throws InvalidArgumentException If the logo path is invalid.
+     * @throws InvalidArgumentException If the logo file does not exist.
      */
-    public function setLogo(string $logoPath, int $logoSize): self;
+    public function setLogo(string $logoPath, int $logoSize = 40): self;
 
     /**
      * Set the label for the QR code.
      *
      * @param string $label The label text.
-     * @param string $textAlign Text alignment ('left', 'center', 'right').
-     * @param string $textColor Hex color for the text.
-     * @param int $fontSize Font size in points.
-     * @param array $margin Margin around the label [top, right, bottom, left].
+     * @param string $textAlign The text alignment (e.g., 'center', 'left').
+     * @param string $textColor The text color in hex format.
+     * @param int $fontSize The font size of the label.
+     * @param array $margin The margin for the label [top, right, bottom, left].
      * @return self
+     * @throws InvalidArgumentException If the label is empty.
      */
     public function setLabel(
         string $label,
-        string $textAlign,
-        string $textColor,
-        int $fontSize,
-        array $margin
+        string $textAlign = 'center',
+        string $textColor = '#000000',
+        int $fontSize = 20,
+        array $margin = [0, 10, 10, 10]
     ): self;
 
     /**
-     * Set the encoding for the QR code data.
+     * Set the encoding for the QR code.
      *
-     * @param string $encoding The encoding format (e.g., 'UTF-8').
+     * @param string $encoding The encoding type.
      * @return self
      */
     public function setEncoding(string $encoding): self;

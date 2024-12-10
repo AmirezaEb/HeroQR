@@ -1,10 +1,10 @@
 <?php
 
-namespace HeroQR\Services;
+namespace HeroQR\Managers;
 
 use Endroid\QrCode\Label\Margin\MarginInterface;
 use Endroid\QrCode\Label\Font\FontInterface;
-use HeroQR\Contracts\services\LabelManagerInterface;
+use HeroQR\Contracts\Managers\LabelManagerInterface;
 use Endroid\QrCode\Color\ColorInterface;
 use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\Label\Font\OpenSans;

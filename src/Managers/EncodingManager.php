@@ -1,8 +1,8 @@
 <?php
 
-namespace HeroQR\Services;
+namespace HeroQR\Managers;
 
-use HeroQR\Contracts\services\EncodingManagerInterface;
+use HeroQR\Contracts\Managers\EncodingManagerInterface;
 use Endroid\QrCode\Encoding\EncodingInterface;
 use Endroid\QrCode\Encoding\Encoding;
 use InvalidArgumentException;

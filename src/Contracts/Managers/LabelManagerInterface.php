@@ -1,6 +1,6 @@
 <?php
 
-namespace HeroQR\Contracts\services;
+namespace HeroQR\Contracts\Managers;
 
 use Endroid\QrCode\Label\Margin\MarginInterface;
 use Endroid\QrCode\Label\Font\FontInterface;
