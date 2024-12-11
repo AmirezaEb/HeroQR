@@ -1,3 +1,5 @@
 vendor/
 public/
 assets/
+composer.lock
+.gitignore

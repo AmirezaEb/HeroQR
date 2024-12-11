@@ -1,6 +1,8 @@
 {
-    "name": "heroexpert/heroqr", 
+    "name": "amirezaeb/heroqr", 
     "description": "A powerful QR Code management library for PHP",
+    "keywords": ["AmirezaEb", "qrcode", "qr", "management", "code", "php"],
+    "homepage": "https://github.com/AmirezaEb/HeroQR",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -16,6 +18,7 @@
         }
     },
     "require": {
+        "php": "^8.2",
         "endroid/qr-code": "^6.0",
         "setasign/fpdf": "^1.8",
         "giggsey/libphonenumber-for-php": "^8.13"
