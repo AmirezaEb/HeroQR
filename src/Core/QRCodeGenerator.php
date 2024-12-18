@@ -3,13 +3,15 @@
 namespace HeroQR\Core;
 
 use HeroQR\Contracts\QRCodeGeneratorInterface;
-use HeroQR\Managers\ColorManager;
-use HeroQR\Managers\LogoManager;
-use HeroQR\Managers\LabelManager;
+use Endroid\QrCode\Writer\Result\ResultInterface;
+use Endroid\QrCode\Writer\WriterInterface;
 use HeroQR\Managers\EncodingManager;
 use Endroid\QrCode\Builder\Builder;
+use HeroQR\Managers\OutputManager;
+use HeroQR\Managers\ColorManager;
+use HeroQR\Managers\LabelManager;
 use Endroid\QrCode\Matrix\Matrix;
-use Endroid\QrCode\Writer\WriterInterface;
+use HeroQR\Managers\LogoManager;
 use HeroQR\DataTypes\DataType;
 use InvalidArgumentException;
 use RuntimeException;
@@ -20,7 +22,7 @@ use RuntimeException;
  */
 class QRCodeGenerator implements QrCodeGeneratorInterface
 {
-    private $builder;
+    private ResultInterface $builder;
     private LabelManager $labelManager;
 
     /**
@@ -41,7 +43,8 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         private string $outputFormat = 'getDataUri',
         private LogoManager $logoManager = new LogoManager(),
         private ColorManager $colorManager = new ColorManager(),
-        private EncodingManager $encodingManager = new EncodingManager()
+        private EncodingManager $encodingManager = new EncodingManager(),
+        private OutputManager $OutputManager = new OutputManager()
     ) {
         $this->labelManager = new LabelManager($this->colorManager);
     }
@@ -56,13 +59,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         return $this->outputFormat === 'getDataUri' ? $this->getDataUri() : $this->getString();
     }
 
-
     /**
-     * Generate a QR code in the specified format.
+     * Generates a QR code based on the specified output format.
      *
-     * @param string $format The desired output format (e.g., 'png', 'svg').
-     * @return self
-     * @throws InvalidArgumentException If the format is invalid.
+     * @param string $format The desired format for the QR code ('gif', 'png', 'svg', 'webp', 'eps', 'pdf', 'binary').
+     * @return self The current QRCodeGenerator instance for method chaining.
+     * @throws InvalidArgumentException If the specified format is not supported.
      */
     public function generate(string $format): self
     {
@@ -88,15 +90,17 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Get the matrix representation of the QR code.
+     * Returns the QR code's matrix representation.
+     * The matrix is a grid of black and white cells representing the QR code.
      *
-     * @return Matrix The matrix object representing the QR code.
-     * @throws RuntimeException If no QR code has been generated yet.
+     * @return Matrix The matrix representation of the QR code.
+     * @throws RuntimeException If the QR code has not been generated yet.
      */
     public function getMatrix(): Matrix
     {
         $this->ensureBuilderExists();
-        return $this->builder->getMatrix();
+
+        return $this->OutputManager->getMatrix($this->builder);
     }
 
     /**
@@ -107,16 +111,9 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      */
     public function getMatrixAsArray(): array
     {
-        $matrix = $this->getMatrix();
-        $matrixArray = [];
+        $this->ensureBuilderExists();
 
-        for ($row = 0; $row < $matrix->getBlockCount(); $row++) {
-            for ($col = 0; $col < $matrix->getBlockCount(); $col++) {
-                $matrixArray[$row][$col] = $matrix->getBlockValue($row, $col);
-            }
-        }
-
-        return $matrixArray;
+        return $this->OutputManager->getMatrixAsArray($this->builder);
     }
 
     /**
@@ -128,8 +125,10 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function getString(): string
     {
         $this->ensureBuilderExists();
+
         $this->outputFormat = 'getString';
-        return $this->builder->getString();
+
+        return $this->OutputManager->getString($this->builder);
     }
 
     /**
@@ -141,7 +140,8 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function getDataUri(): string
     {
         $this->ensureBuilderExists();
-        return $this->builder->getDataUri();
+
+        return $this->OutputManager->getDataUri($this->builder);
     }
 
     /**
@@ -156,26 +156,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     {
         $this->ensureBuilderExists();
 
-        $format = strtolower($this->builder->getMimeType());
-        $extension = match ($format) {
-            'image/png' => '.png',
-            'image/gif' => '.gif',
-            'image/svg+xml' => '.svg',
-            'image/webp' => '.webp',
-            'image/eps' => '.eps',
-            'application/pdf' => '.pdf',
-            'application/postscript' => '.eps',
-            'application/octet-stream' => '.bin',
-            'text/plain' => '.bin',
-            default => throw new InvalidArgumentException('Unsupported format.'),
-        };
-
-        $fullPath = $path . $extension;
-
-        if ($this->builder->saveToFile($fullPath)) {
-            return true;
-        }
-        return false;
+        return $this->OutputManager->saveTo($this->builder, $path);
     }
 
     /**
@@ -199,30 +180,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
 
         $this->data = $this->dataSanitizer($data, $type);
         return $this;
-    }
-
-    /**
-     * Sanitizes and formats data based on the provided data type.
-     * 
-     * This method sanitizes the input data and adds the appropriate prefix or URL based on the data type.
-     * 
-     * @param string $data The raw data to sanitize and format.
-     * @param DataType $type The type of data (e.g., Email, Phone, Wifi, Location).
-     * @return string The sanitized and formatted data.
-     */
-    public function dataSanitizer(string $data, DataType $type)
-    {
-        $data = htmlspecialchars($data);
-
-        $extension = match ($type) {
-            DataType::Email => "mailto:{$data}",
-            DataType::Phone => "tel:{$data}",
-            DataType::Wifi => "$data",
-            DataType::Location => "https://www.google.com/maps?q=$data",
-            default => $data,
-        };
-
-        return $extension;
     }
 
     /**
@@ -312,6 +269,17 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         return $this;
     }
 
+    /**
+     * Set the label properties for the QR code.
+     *
+     * @param string $label The text label to be displayed on the QR code.
+     * @param string $textAlign The text alignment for the label (default is 'center').
+     * @param string $textColor The color of the label text in hexadecimal format (default is '#000000').
+     * @param int $fontSize The font size of the label text (default is 20).
+     * @param array $margin The margin around the label in the format [top, right, bottom, left] (default is [0, 10, 10, 10]).
+     * @return self Returns the current instance for method chaining.
+     * @throws InvalidArgumentException If the label text is empty.
+     */
     public function setLabel(
         string $label,
         string $textAlign = 'center',
@@ -332,10 +300,41 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         return $this;
     }
 
+    /**
+     * Set the encoding type for the QR code.
+     *
+     * @param string $encoding The encoding type ('UTF-16' ,'UTF-8', 'ASCII', 'ISO-8859-1', 'ISO-8859-5', 'ISO-8859-15') and more...
+     * 
+     * @return self Returns the current instance for method chaining.
+     */
     public function setEncoding(string $encoding): self
     {
         $this->encodingManager->setEncoding($encoding);
+
         return $this;
+    }
+
+    /**
+     * Encodes the data with type-specific rules and sanitizes the input.
+     * Supports data types like Email, Phone, and Location.
+     *
+     * @param string $data The raw data to encode.
+     * @param DataType $type The type of data being encoded (e.g., Text, Email, Phone).
+     * @return string Sanitized and properly formatted data string.
+     */
+    private function dataSanitizer(string $data, DataType $type)
+    {
+        $data = htmlspecialchars($data);
+
+        $extension = match ($type) {
+            DataType::Email => "mailto:{$data}",
+            DataType::Phone => "tel:{$data}",
+            DataType::Wifi => "$data",
+            DataType::Location => "https://www.google.com/maps?q=$data",
+            default => $data,
+        };
+
+        return $extension;
     }
 
     /**

@@ -18,7 +18,8 @@ HeroQR is an advanced and modular PHP library designed to simplify the creation,
 
 ## Installation
 
-Installing HeroQR is quick and easy with Composer:
+Use [Composer](https://getcomposer.org/) to install the library. Also make sure you have enabled and configured the
+[GD extension](https://www.php.net/manual/en/book.image.php) if you want to generate images.
 
 ```bash
 composer require amirezaeb/heroqr

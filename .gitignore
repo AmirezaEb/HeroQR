@@ -1,5 +1,5 @@
-vendor/
-public/
-assets/
-composer.lock
-.gitignore
+/vendor
+/public
+/assets
+/composer.lock
+/phpunit.xml

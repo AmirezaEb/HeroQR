@@ -37,21 +37,13 @@ class EncodingManager implements EncodingManagerInterface
     /**
      * Set a new encoding.
      * 
-     * @param string $encoding The desired encoding (e.g., 'UTF-8', 'ISO-8859-1').
+     * @param string $encoding The desired encoding ('UTF-16' ,'UTF-8', 'ASCII', 'ISO-8859-1', 'ISO-8859-5', 'ISO-8859-15') and more...
      * @throws InvalidArgumentException If the encoding is invalid or unsupported.
      */
     public function setEncoding(string $encoding): void
     {
         if (empty($encoding)) {
             throw new InvalidArgumentException('Encoding cannot be empty.');
-        }
-
-        # Validate the encoding against a list of supported encodings.
-        $supportedEncodings = ['UTF-8', 'ISO-8859-1', 'ISO-8859-5', 'ISO-8859-15'];
-        if (!in_array($encoding, $supportedEncodings, true)) {
-            throw new InvalidArgumentException(
-                sprintf('Unsupported encoding "%s". Supported encodings are: %s.', $encoding, implode(', ', $supportedEncodings))
-            );
         }
 
         $this->encoding = new Encoding($encoding);
