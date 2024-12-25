@@ -261,7 +261,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function setLogo(string $logoPath, int $logoSize = 40): self
     {
         if (!file_exists($logoPath)) {
-            throw new InvalidArgumentException('Logo file does not exist.');
+            throw new InvalidArgumentException('Logo File Does Not Exist');
         }
 
         $this->logoManager->setLogo($logoPath);
@@ -349,12 +349,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         $writerClass = 'Endroid\QrCode\Writer\\' . ucfirst($format) . 'Writer';
 
         if (!class_exists($writerClass)) {
-            throw new InvalidArgumentException(sprintf('Format "%s" does not exist.', $format));
+            throw new InvalidArgumentException(sprintf('Format "%s" Does Not Exist', $format));
         }
 
         $writer = new $writerClass();
         if (!$writer instanceof WriterInterface) {
-            throw new InvalidArgumentException(sprintf('Format "%s" is not supported.', $format));
+            throw new InvalidArgumentException(sprintf('Format "%s" Is Not Supported', $format));
         }
         return $writer;
     }
@@ -367,8 +367,9 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      */
     private function isValidHexColor(string $hexColor): bool
     {
-        return preg_match('/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/', $hexColor) === 1;
+        return preg_match('/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/', $hexColor) === 1;
     }
+
 
     /**
      * Helper method to ensure that the builder has been initialized.

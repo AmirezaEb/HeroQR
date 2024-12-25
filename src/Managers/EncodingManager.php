@@ -43,7 +43,7 @@ class EncodingManager implements EncodingManagerInterface
     public function setEncoding(string $encoding): void
     {
         if (empty($encoding)) {
-            throw new InvalidArgumentException('Encoding cannot be empty.');
+            throw new InvalidArgumentException('Encoding Cannot Be Empty');
         }
 
         $this->encoding = new Encoding($encoding);

@@ -37,7 +37,7 @@ class OutputManager implements OutputManagerInterface
         $fullPath = $path . $extension;
 
         if (!$builder->saveToFile($fullPath) && !file_exists($fullPath)) {
-            throw new InvalidArgumentException('Saving to file failed');
+            throw new InvalidArgumentException('Saving To File Failed');
         }
 
         return true;

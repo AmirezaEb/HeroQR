@@ -42,16 +42,14 @@ class LabelManager implements LabelManagerInterface
      */
     public function setLabel(string $label): void
     {
-        // Validate label text
         if (empty($label)) {
-            throw new InvalidArgumentException('Label text cannot be empty');
+            throw new InvalidArgumentException('Label Text Cannot Be Empty');
         }
 
         if (strlen($label) > 200) {
-            throw new InvalidArgumentException('Label text cannot exceed 200 characters');
+            throw new InvalidArgumentException('Label Text Cannot Exceed 200 Characters');
         }
 
-        // Sanitize label to prevent XSS attacks
         $this->label = htmlspecialchars($label);
     }
 
@@ -84,10 +82,9 @@ class LabelManager implements LabelManagerInterface
     public function setLabelSize(int $size): void
     {
         if ($size <= 0) {
-            throw new InvalidArgumentException('Font size must be a positive integer');
+            throw new InvalidArgumentException('Font Size Must Be A Positive Integer');
         }
 
-        // Update font size by creating a new font instance
         $this->labelFont = new OpenSans($size);
     }
 
@@ -99,11 +96,11 @@ class LabelManager implements LabelManagerInterface
      */
     public function setLabelAlign(string $labelAlign): void
     {
+        $labelAlign = strtolower($labelAlign);
         if (!in_array($labelAlign, ['left', 'center', 'right'], true)) {
-            throw new InvalidArgumentException('Invalid label alignment. Allowed values are "left", "center", or "right".');
+            throw new InvalidArgumentException('Invalid Label Alignment. Allowed Values Are "left", "center", or "right"');
         }
 
-        // Set the alignment using the LabelAlignment enum
         $this->labelAlign = LabelAlignment::from($labelAlign);
     }
 
@@ -123,14 +120,13 @@ class LabelManager implements LabelManagerInterface
      * @param string $color The color in hex format (e.g., "#FF5733").
      * @throws InvalidArgumentException If the color format is invalid.
      */
-    public function setLabelColor(string $color): void
+    public function setLabelColor(string $hexColor): void
     {
-        if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color)) {
-            throw new InvalidArgumentException('Invalid color format. Please use hex format like "#FF5733".');
+        if (!$this->isValidHexColor($hexColor)) {
+            throw new InvalidArgumentException('Invalid Label Color Format');
         }
 
-        // Use ColorManager to set the label color
-        $this->labelColor->setLabelColor($color);
+        $this->labelColor->setLabelColor($hexColor);
     }
 
     /**
@@ -152,12 +148,22 @@ class LabelManager implements LabelManagerInterface
     public function setLabelMargin(array $margin): void
     {
         if (count($margin) !== 4) {
-            throw new InvalidArgumentException('Margin array must contain exactly 4 values [top, right, bottom, left].');
+            throw new InvalidArgumentException('Margin Array Must Contain Exactly 4 Values [top, right, bottom, left]');
         }
 
-        // Set the label margin using the provided values
+        foreach ($margin as $key => $value) {
+            if (!is_numeric($value)) {
+                throw new InvalidArgumentException("Margin Value At Index {$key} Must Be Numeric Value");
+            }
+
+            if ($value < -250 || $value > 250) {
+                throw new InvalidArgumentException("Margin Value At Index {$key} Must Be Between -250 And 250");
+            }
+        }
+
         $this->labelMargin = new Margin($margin[0], $margin[1], $margin[2], $margin[3]);
     }
+
 
     /**
      * Get the current label margin.
@@ -167,5 +173,16 @@ class LabelManager implements LabelManagerInterface
     public function getLabelMargin(): MarginInterface
     {
         return $this->labelMargin;
+    }
+
+    /**
+     * Helper method to validate if a hex color is valid.
+     *
+     * @param string $hexColor The color code to validate.
+     * @return bool True if the color code is valid, false otherwise.
+     */
+    private function isValidHexColor(string $hexColor): bool
+    {
+        return preg_match('/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/', $hexColor) === 1;
     }
 }

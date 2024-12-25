@@ -24,7 +24,7 @@ class LogoManager implements LogoManagerInterface
     public function setLogo(string $logoPath): void
     {
         if (!file_exists($logoPath) || !is_readable($logoPath)) {
-            throw new InvalidArgumentException("Logo path '{$logoPath}' does not exist or is not readable.");
+            throw new InvalidArgumentException("Logo Path '{$logoPath}' Does Not Exist Or Is Not Readable");
         }
 
         $this->logoPath = $logoPath;
@@ -69,7 +69,7 @@ class LogoManager implements LogoManagerInterface
     public function setLogoSize(int $size): void
     {
         if ($size <= 0) {
-            throw new InvalidArgumentException('Logo size must be a positive integer.');
+            throw new InvalidArgumentException('Logo Size Must Be A Positive Integer');
         }
 
         $this->logoSize = $size;
