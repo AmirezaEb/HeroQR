@@ -1,14 +1,21 @@
 {
-    "name": "amirezaeb/heroqr", 
+    "name": "amirezaeb/heroqr",
     "description": "A Powerful QR Code Management Library For PHP",
-    "keywords": ["AmirezaEb", "qrcode", "qr", "management", "code", "php"],
+    "keywords": [
+        "AmirezaEb",
+        "qrcode",
+        "qr",
+        "management",
+        "code",
+        "php"
+    ],
     "homepage": "https://github.com/AmirezaEb/HeroQR",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Amirreza",
+            "name": "Amirreza Ebrahimi",
             "email": "aabrahimi1718@gmail.com",
             "role": "Developer"
         }
@@ -25,12 +32,14 @@
     },
     "require": {
         "php": "^8.2",
-        "endroid/qr-code": "^6.0",
-        "setasign/fpdf": "^1.8",
-        "giggsey/libphonenumber-for-php": "^8.13",
-        "illuminate/support": "^11.35"
+        "endroid/qr-code": "^6.0"
     },
-    "require-dev": {          
+    "suggest": {
+        "giggsey/libphonenumber-for-php": "Required for advanced phone number validation",
+        "setasign/fpdf": "Required for PDF generation features",
+        "ext-gd": "Required for image processing, including generating PNG images"
+    },
+    "require-dev": {
         "phpunit/phpunit": "^11.4"
     },
     "extra": {

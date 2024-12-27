@@ -22,7 +22,8 @@ class Location extends AbstractDataType
     public static function validate(string $coordinates): bool
     {
         $coordinates = trim($coordinates);
-        $parts = array_filter(explode(',', $coordinates), 'strlen');
+        
+        $parts = explode(',', $coordinates);
 
         if (count($parts) < 2 || count($parts) > 3) {
             return false;

@@ -16,6 +16,9 @@ final class LogoManagerTest extends TestCase
 {
     private LogoManagerInterface $logoManager;
 
+    /**
+     * Setup method
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -23,10 +26,10 @@ final class LogoManagerTest extends TestCase
     }
 
     /**
-     * Test setting and getting the logo path with a valid file.
+     * Test setting and getting the logo path with a valid file
      */
     #[Test]
-    public function isSetAndGetLogoPath()
+    public function isSetAndGetLogoPath(): void
     {
         $logoManager = $this->logoManager;
 
@@ -43,10 +46,10 @@ final class LogoManagerTest extends TestCase
     }
 
     /**
-     * Test setting an invalid logo path throws an exception.
+     * Test setting an invalid logo path throws an exception
      */
     #[Test]
-    public function isSetInvalidLogoPathThrowsException()
+    public function isSetInvalidLogoPathThrowsException(): void
     {
         $logoManager = $this->logoManager;
 
@@ -58,10 +61,10 @@ final class LogoManagerTest extends TestCase
     }
 
     /**
-     * Test setting and getting the logo background setting.
+     * Test setting and getting the logo background setting
      */
     #[Test]
-    public function isSetAndGetLogoBackground()
+    public function isSetAndGetLogoBackground(): void
     {
         $logoManager = $this->logoManager;
 
@@ -74,10 +77,10 @@ final class LogoManagerTest extends TestCase
     }
 
     /**
-     * Test setting and getting the logo size.
+     * Test setting and getting the logo size
      */
     #[Test]
-    public function isSetAndGetLogoSize()
+    public function isSetAndGetLogoSize(): void
     {
         $logoManager = $this->logoManager;
 
@@ -87,10 +90,10 @@ final class LogoManagerTest extends TestCase
     }
 
     /**
-     * Test setting an invalid logo size throws an exception.
+     * Test setting an invalid logo size throws an exception
      */
     #[Test]
-    public function isSetInvalidLogoSizeThrowsException()
+    public function isSetInvalidLogoSizeThrowsException(): void
     {
         $logoManager = $this->logoManager;
 

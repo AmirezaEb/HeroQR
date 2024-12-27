@@ -7,15 +7,29 @@ use HeroQR\Contracts\DataTypes\AbstractDataType;
 /**
  * Class Wifi
  *
- * This class validates Wi-Fi credentials for QR Code generation.
- * It checks if the provided Wi-Fi string follows the format:
+ * This class validates Wi-Fi credentials for QR Code generation. It ensures the Wi-Fi credentials 
+ * follow the correct format based on the specified encryption type and SSID/password criteria.
+ * 
+ * The valid format for Wi-Fi credentials is:
  *   WIFI:T:<encryptionType>;S:<SSID>;P:<password>;
+ * 
+ * Supported encryption types:
+ * - WPA
+ * - WPA2
+ * - WEP
+ * - nopass (no password required)
+ * - WPA/WPA2-Personal (treated as WPA2)
+ * 
+ * The class performs the following checks:
+ * - Ensures the SSID is valid (max length of 32 characters, no special characters like ';' or ':')
+ * - Validates the password based on the encryption type:
+ *   - For WPA and WPA2: password length should be between 8 and 63 characters.
+ *   - For WEP: password length should be either 10 or 26 characters and must be hexadecimal.
+ *   - For nopass: no password should be provided.
  *
- * Supported encryption types: WPA, WPA2, WEP, nopass, and WPA/WPA2-Personal (treated as WPA2).
- * It ensures that the SSID and password (if required) meet the necessary criteria.
- *
- * Example: WIFI:T:WPA2;S:MyNetwork;P:password123;
- *
+ * Example usage:
+ *   WIFI:T:WPA2;S:MyNetwork;P:password123;
+ * 
  * @package HeroQR\DataTypes
  */
 
@@ -23,7 +37,7 @@ class Wifi extends AbstractDataType
 {
     public static function validate(string $wifiString): bool
     {
-        $pattern = '/^WIFI:T:(WPA|WPA2|WEP|nopass|WPA\/WPA2-Personal);S:([^;]+);(?:P:([^;]*);)?;$/';
+        $pattern = '/^WIFI:T:(WPA|WPA2|WEP|nopass|WPA\/WPA2-Personal);S:([^;]+);(?:P:([^;]*))?;$/';
 
         if (empty($wifiString) || !preg_match($pattern, $wifiString, $matches)) {
             return false;

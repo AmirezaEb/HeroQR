@@ -2,8 +2,11 @@
 
 namespace HeroQR\DataTypes;
 
-use HeroQR\Contracts\DataTypes\AbstractDataType;
+use RuntimeException;
 use libphonenumber\PhoneNumberUtil;
+use HeroQR\Contracts\DataTypes\AbstractDataType;
+
+// use libphonenumber\PhoneNumberUtil;
 
 /**
  * Class Phone
@@ -24,7 +27,14 @@ class Phone extends AbstractDataType
 {
     public static function validate(string $phone): bool
     {
-        $phoneNumberUtil = PhoneNumberUtil::getInstance();
+        $className = 'libphonenumber\PhoneNumberUtil';
+
+        if (!class_exists($className)) {
+            throw new RuntimeException('The library "<a href="https://github.com/giggsey/libphonenumber-for-php" target="_blank" style="text-decoration: none;">giggsey/libphonenumber-for-php</a>" is required for phone number validation. Please install it using "composer require giggsey/libphonenumber-for-php".');
+        }
+        
+        
+        $phoneNumberUtil = $className::getInstance();
 
         $phoneNumber = $phoneNumberUtil->parse($phone, null);
 

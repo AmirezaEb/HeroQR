@@ -21,6 +21,9 @@ class OutputManagerTest extends TestCase
     private QrCodeInterface $qrCodeGenerator;
     private OutputManager $outputManager;
 
+    /** 
+     * Setup method
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -29,7 +32,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Test saving QR code to different formats.
+     * Test saving QR code to different formats
      */
     #[Test]
     public function isSaveTo(): void
@@ -53,7 +56,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Test saving QR code to an unsupported format.
+     * Test saving QR code to an unsupported format
      */
     #[Test]
     public function isSaveToUnsupportedFormat(): void
@@ -65,7 +68,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Test generating a data URI for QR code.
+     * Test generating a data URI for QR code
      */
     #[Test]
     public function isGetDataUri(): void
@@ -77,7 +80,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Test converting QR code matrix to an array.
+     * Test converting QR code matrix to an array
      */
     #[Test]
     public function isGetMatrixAsArray(): void
@@ -107,7 +110,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Test retrieving the QR code matrix object.
+     * Test retrieving the QR code matrix object
      */
     #[Test]
     public function isGetMatrix(): void
@@ -125,7 +128,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Test converting QR code to string.
+     * Test converting QR code to string
      */
     #[Test]
     public function isGetString(): void
@@ -137,7 +140,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Validate and retrieve the writer instance for a given format.
+     * Validate and retrieve the writer instance for a given format
      */
     private function validateWriter(string $format): WriterInterface
     {
@@ -157,7 +160,7 @@ class OutputManagerTest extends TestCase
     }
 
     /**
-     * Delete a file if it exists.
+     * Delete a file if it exists
      */
     private function deleteFile(string $filePath): void
     {

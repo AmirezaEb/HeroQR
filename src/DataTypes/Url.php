@@ -25,11 +25,24 @@ class Url extends AbstractDataType
 {
     public static function validate(string $url): bool
     {
-        if (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('/\.[a-z]{2,}$/i', parse_url($url)['host'])) {
+        $parsedUrl = parse_url($url);
+
+        if (!filter_var($url, FILTER_VALIDATE_URL) || !isset($parsedUrl['host'])) {
+            return false;
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $parsedUrl['host']) 
+            && !filter_var($parsedUrl['host'], FILTER_VALIDATE_IP)) {
             return false;
         }
 
         if (self::hasSqlInjection($url) || self::hasScriptTag($url) || preg_match('/(\.\.\/)/', $url)) {
+            return false;
+        }
+
+        if (!filter_var($parsedUrl['host'], FILTER_VALIDATE_IP) 
+            && !checkdnsrr($parsedUrl['host'], 'A') 
+            && !checkdnsrr($parsedUrl['host'], 'CNAME')) {
             return false;
         }
 

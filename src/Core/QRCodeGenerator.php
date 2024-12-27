@@ -319,7 +319,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * Supports data types like Email, Phone, and Location.
      *
      * @param string $data The raw data to encode.
-     * @param DataType $type The type of data being encoded (e.g., Text, Email, Phone).
+     * @param DataType $type The type of data being encoded (Url, Wifi, Location, Text, Email, Phone).
      * @return string Sanitized and properly formatted data string.
      */
     private function dataSanitizer(string $data, DataType $type)
@@ -346,6 +346,10 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      */
     private function validateWriter(string $format): WriterInterface
     {
+        if ($format === 'pdf' && !class_exists('FPDF')) {
+            throw new RuntimeException('The library "<a href="https://github.com/Setasign/FPDF" target="_blank" style="text-decoration: none;">setasign/fpdf</a>" is required for PDF generation. Please install it using "composer require setasign/fpdf".');
+        }
+
         $writerClass = 'Endroid\QrCode\Writer\\' . ucfirst($format) . 'Writer';
 
         if (!class_exists($writerClass)) {
