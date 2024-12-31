@@ -5,6 +5,8 @@ namespace HeroQR\Core;
 use HeroQR\Contracts\QRCodeGeneratorInterface;
 use Endroid\QrCode\Writer\Result\ResultInterface;
 use Endroid\QrCode\Writer\WriterInterface;
+use Endroid\QrCode\Color\ColorInterface;
+use Endroid\QrCode\ErrorCorrectionLevel;
 use HeroQR\Managers\EncodingManager;
 use Endroid\QrCode\Builder\Builder;
 use HeroQR\Managers\OutputManager;
@@ -18,7 +20,7 @@ use RuntimeException;
 
 /**
  * Class QRCodeGenerator
- * Handles the generation of QR codes with customizable options.
+ * Handles the generation of QR codes with customizable options
  */
 class QRCodeGenerator implements QrCodeGeneratorInterface
 {
@@ -27,14 +29,14 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
 
     /**
      * QRCodeGenerator constructor.
-     * Initializes the necessary services and sets default values for QR code properties.
+     * Initializes the necessary services and sets default values for QR code properties
      *
-     * @param string $outputFormat The output format (default is 'getDataUri').
-     * @param int $size The size of the QR code (default is 200).
-     * @param int $margin The margin around the QR code (default is 10).
-     * @param LogoManager $logoManager The logo manager instance.
-     * @param ColorManager $colorManager The color manager instance.
-     * @param EncodingManager $encodingManager The encoding manager instance.
+     * @param string $outputFormat The output format (default is 'getDataUri')
+     * @param int $size The size of the QR code (default is 200)
+     * @param int $margin The margin around the QR code (default is 10)
+     * @param LogoManager $logoManager The logo manager instance
+     * @param ColorManager $colorManager The color manager instance
+     * @param EncodingManager $encodingManager The encoding manager instance
      */
     public function __construct(
         private int $size = 200,
@@ -50,9 +52,9 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Magic method to return the QR code as a string, based on the specified output format.
+     * Magic method to return the QR code as a string, based on the specified output format
      *
-     * @return string The generated QR code as a string.
+     * @return string The generated QR code as a string
      */
     public function __toString(): string
     {
@@ -60,11 +62,11 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Generates a QR code based on the specified output format.
+     * Generates a QR code based on the specified output format
      *
-     * @param string $format The desired format for the QR code ('gif', 'png', 'svg', 'webp', 'eps', 'pdf', 'binary').
-     * @return self The current QRCodeGenerator instance for method chaining.
-     * @throws InvalidArgumentException If the specified format is not supported.
+     * @param string $format The desired format for the QR code ('gif', 'png', 'svg', 'webp', 'eps', 'pdf', 'binary')
+     * @return self The current QRCodeGenerator instance for method chaining
+     * @throws InvalidArgumentException If the specified format is not supported
      */
     public function generate(string $format): self
     {
@@ -72,12 +74,14 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
             writer: $this->validateWriter($format),
             data: $this->data,
             encoding: $this->encodingManager->getEncoding(),
+            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
             size: $this->size,
             margin: $this->margin,
             foregroundColor: $this->colorManager->getColor(),
             backgroundColor: $this->colorManager->getBackgroundColor(),
             logoPath: $this->logoManager->getLogoPath(),
             logoResizeToWidth: $this->logoManager->getLogoSize(),
+            logoResizeToHeight: $this->logoManager->getLogoSize(),
             logoPunchoutBackground: $this->logoManager->getLogoBackground(),
             labelText: $this->labelManager->getLabel(),
             labelFont: $this->labelManager->getLabelFont(),
@@ -90,11 +94,11 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Returns the QR code's matrix representation.
-     * The matrix is a grid of black and white cells representing the QR code.
+     * Returns the QR code's matrix representation
+     * The matrix is a grid of black and white cells representing the QR code
      *
-     * @return Matrix The matrix representation of the QR code.
-     * @throws RuntimeException If the QR code has not been generated yet.
+     * @return Matrix The matrix representation of the QR code
+     * @throws RuntimeException If the QR code has not been generated yet
      */
     public function getMatrix(): Matrix
     {
@@ -104,10 +108,10 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Get the matrix as an array.
+     * Get the matrix as an array
      *
-     * @return array The QR code matrix represented as a 2D array.
-     * @throws RuntimeException If no QR code has been generated yet.
+     * @return array The QR code matrix represented as a 2D array
+     * @throws RuntimeException If no QR code has been generated yet
      */
     public function getMatrixAsArray(): array
     {
@@ -117,25 +121,23 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Get the QR code as a string.
-     * 
-     * @return string The QR code as a string.
-     * @throws RuntimeException If no QR code has been generated yet.
+     * Returns the QR code as a raw string
+     *
+     * @return string The raw string representation of the QR code
+     * @throws RuntimeException If the QR code has not been generated yet
      */
     public function getString(): string
     {
         $this->ensureBuilderExists();
 
-        $this->outputFormat = 'getString';
-
         return $this->OutputManager->getString($this->builder);
     }
 
     /**
-     * Get the QR code as a Data URI.
-     * 
-     * @return string The QR code as a Data URI.
-     * @throws RuntimeException If no QR code has been generated yet.
+     * Returns the QR code as a Base64-encoded data URI
+     *
+     * @return string The data URI representation of the QR code
+     * @throws RuntimeException If the QR code has not been generated yet
      */
     public function getDataUri(): string
     {
@@ -145,12 +147,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Save the generated QR code to a file.
+     * Save the generated QR code to a file
      * 
-     * @param string $path The path to save the QR code file.
-     * @return bool True if the file was saved successfully, false otherwise.
-     * @throws InvalidArgumentException If the format is unsupported.
-     * @throws RuntimeException If no QR code has been generated yet.
+     * @param string $path The path to save the QR code file
+     * @return bool True if the file was saved successfully, false otherwise
+     * @throws InvalidArgumentException If the format is unsupported
+     * @throws RuntimeException If no QR code has been generated yet
      */
     public function saveTo(string $path): bool
     {
@@ -160,11 +162,11 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the data to be encoded in the QR code.
+     * Set the data to be encoded in the QR code
      *
-     * @param string $data The data to encode.
+     * @param string $data The data to encode
      * @return self
-     * @throws InvalidArgumentException If the data is empty.
+     * @throws InvalidArgumentException If the data is empty
      */
     public function setData(string $data, DataType $type = DataType::Text): self
     {
@@ -183,11 +185,21 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the size of the QR code.
+     * Retrieves the data value
      *
-     * @param int $size The size of the QR code.
+     * @return string|null The data if available, null otherwise
+     */
+    public function getData(): ?string
+    {
+        return $this->data;
+    }
+
+    /**
+     * Set the size of the QR code
+     *
+     * @param int $size The size of the QR code
      * @return self
-     * @throws InvalidArgumentException If the size is not a positive integer.
+     * @throws InvalidArgumentException If the size is not a positive integer
      */
     public function setSize(int $size): self
     {
@@ -200,11 +212,21 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the margin around the QR code.
+     * Retrieves the size value
      *
-     * @param int $margin The margin size.
+     * @return int The size value
+     */
+    public function getSize(): int
+    {
+        return $this->size;
+    }
+
+    /**
+     * Set the margin around the QR code
+     *
+     * @param int $margin The margin size
      * @return self
-     * @throws InvalidArgumentException If the margin is negative.
+     * @throws InvalidArgumentException If the margin is negative
      */
     public function setMargin(int $margin): self
     {
@@ -217,16 +239,26 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the color of the QR code foreground.
+     * Retrieves the margin value
      *
-     * @param string $hexColor The hexadecimal color code.
+     * @return int The margin value
+     */
+    public function getMargin(): int
+    {
+        return $this->margin;
+    }
+
+    /**
+     * Set the color of the QR code foreground
+     *
+     * @param string $hexColor The hexadecimal color code
      * @return self
-     * @throws InvalidArgumentException If the color format is invalid.
+     * @throws InvalidArgumentException If the color format is invalid
      */
     public function setColor(string $hexColor): self
     {
         if (!$this->isValidHexColor($hexColor)) {
-            throw new InvalidArgumentException('Invalid color format.');
+            throw new InvalidArgumentException('Invalid color format');
         }
 
         $this->colorManager->setColor($hexColor);
@@ -234,16 +266,26 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the background color of the QR code.
+     * Retrieves the color from the color manager
      *
-     * @param string $hexColor The hexadecimal color code.
+     * @return ColorInterface The color object
+     */
+    public function getColor(): ColorInterface
+    {
+        return $this->colorManager->getColor();
+    }
+
+    /**
+     * Set the background color of the QR code
+     *
+     * @param string $hexColor The hexadecimal color code
      * @return self
-     * @throws InvalidArgumentException If the color format is invalid.
+     * @throws InvalidArgumentException If the color format is invalid
      */
     public function setBackgroundColor(string $hexColor): self
     {
         if (!$this->isValidHexColor($hexColor)) {
-            throw new InvalidArgumentException('Invalid background color format.');
+            throw new InvalidArgumentException('Invalid background color format');
         }
 
         $this->colorManager->setBackgroundColor($hexColor);
@@ -251,12 +293,22 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the logo to be embedded in the QR code.
+     * Retrieves the background color from the color manager
      *
-     * @param string $logoPath The path to the logo file.
-     * @param int $logoSize The size of the logo.
+     * @return ColorInterface The background color object
+     */
+    public function getBackgroundColor(): ColorInterface
+    {
+        return $this->colorManager->getBackgroundColor();
+    }
+
+    /**
+     * Set the logo to be embedded in the QR code
+     *
+     * @param string $logoPath The path to the logo file
+     * @param int $logoSize The size of the logo
      * @return self
-     * @throws InvalidArgumentException If the logo file does not exist.
+     * @throws InvalidArgumentException If the logo file does not exist
      */
     public function setLogo(string $logoPath, int $logoSize = 40): self
     {
@@ -270,15 +322,25 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the label properties for the QR code.
+     * Retrieves the logo path from the logo manager
      *
-     * @param string $label The text label to be displayed on the QR code.
-     * @param string $textAlign The text alignment for the label (default is 'center').
-     * @param string $textColor The color of the label text in hexadecimal format (default is '#000000').
-     * @param int $fontSize The font size of the label text (default is 20).
-     * @param array $margin The margin around the label in the format [top, right, bottom, left] (default is [0, 10, 10, 10]).
-     * @return self Returns the current instance for method chaining.
-     * @throws InvalidArgumentException If the label text is empty.
+     * @return string|null The logo path if available, null otherwise
+     */
+    public function getLogoPath(): ?string
+    {
+        return $this->logoManager->getLogoPath();
+    }
+
+    /**
+     * Set the label properties for the QR code
+     *
+     * @param string $label The text label to be displayed on the QR code
+     * @param string $textAlign The text alignment for the label (default is 'center')
+     * @param string $textColor The color of the label text in hexadecimal format (default is '#000000')
+     * @param int $fontSize The font size of the label text (default is 20)
+     * @param array $margin The margin around the label in the format [top, right, bottom, left] (default is [0, 10, 10, 10])
+     * @return self Returns the current instance for method chaining
+     * @throws InvalidArgumentException If the label text is empty
      */
     public function setLabel(
         string $label,
@@ -288,7 +350,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         array $margin = [0, 10, 10, 10]
     ): self {
         if (empty($label)) {
-            throw new InvalidArgumentException('Label cannot be empty.');
+            throw new InvalidArgumentException('Label cannot be empty');
         }
 
         $this->labelManager->setLabel($label);
@@ -301,11 +363,20 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Set the encoding type for the QR code.
+     * Retrieves the label from the label manager
+     *
+     * @return string|null The label if available, null otherwise
+     */
+    public function getLabel(): ?string
+    {
+        return $this->labelManager->getLabel();
+    }
+
+    /**
+     * Set the encoding type for the QR code
      *
      * @param string $encoding The encoding type ('UTF-16' ,'UTF-8', 'ASCII', 'ISO-8859-1', 'ISO-8859-5', 'ISO-8859-15') and more...
-     * 
-     * @return self Returns the current instance for method chaining.
+     * @return self Returns the current instance for method chaining
      */
     public function setEncoding(string $encoding): self
     {
@@ -315,12 +386,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Encodes the data with type-specific rules and sanitizes the input.
-     * Supports data types like Email, Phone, and Location.
+     * Encodes the data with type-specific rules and sanitizes the input
+     * Supports data types like Email, Phone, and Location
      *
-     * @param string $data The raw data to encode.
-     * @param DataType $type The type of data being encoded (Url, Wifi, Location, Text, Email, Phone).
-     * @return string Sanitized and properly formatted data string.
+     * @param string $data The raw data to encode
+     * @param DataType $type The type of data being encoded (Url, Wifi, Location, Text, Email, Phone)
+     * @return string Sanitized and properly formatted data string
      */
     private function dataSanitizer(string $data, DataType $type)
     {
@@ -338,11 +409,11 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Helper method to validate the writer for the given format.
+     * Helper method to validate the writer for the given format
      *
-     * @param string $format The format to validate.
-     * @return WriterInterface The writer interface instance for the specified format.
-     * @throws InvalidArgumentException If the format is invalid.
+     * @param string $format The format to validate
+     * @return WriterInterface The writer interface instance for the specified format
+     * @throws InvalidArgumentException If the format is invalid
      */
     private function validateWriter(string $format): WriterInterface
     {
@@ -364,21 +435,20 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Helper method to validate if a hex color is valid.
+     * Helper method to validate if a hex color is valid
      *
-     * @param string $hexColor The color code to validate.
-     * @return bool True if the color code is valid, false otherwise.
+     * @param string $hexColor The color code to validate
+     * @return bool True if the color code is valid, false otherwise
      */
     private function isValidHexColor(string $hexColor): bool
     {
         return preg_match('/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/', $hexColor) === 1;
     }
 
-
     /**
-     * Helper method to ensure that the builder has been initialized.
+     * Helper method to ensure that the builder has been initialized
      *
-     * @throws RuntimeException If the builder has not been initialized.
+     * @throws RuntimeException If the builder has not been initialized
      */
     private function ensureBuilderExists(): void
     {

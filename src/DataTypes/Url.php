@@ -7,16 +7,23 @@ use HeroQR\Contracts\DataTypes\AbstractDataType;
 /**
  * Class Url
  *
- * This class validates a URL to ensure it follows proper structure and does not contain unsafe content.
- * It checks if the URL is valid, if the host has a valid domain, and ensures that the URL does not contain
- * common security vulnerabilities such as SQL injection, script tags, or relative path traversals.
+ * This class validates a URL to ensure it follows a proper structure and does not contain unsafe content.
+ * It checks the URL's validity by verifying the following:
+ *   - The URL format (http/https).
+ *   - The URL contains a valid domain (host).
+ *   - The URL is not malicious, ensuring no SQL injections, script tags, or relative path traversals.
  *
- * It performs the following checks:
- *   - Validates the structure of the URL using PHP's filter_var function.
- *   - Ensures the host part has a valid domain with a top-level domain.
- *   - Checks for common security issues like SQL injection, script tags, and relative path traversal.
+ * The URL is first checked using PHP's filter_var function, then it ensures that:
+ *   - The URL follows a valid format using a regular expression (regex).
+ *   - The host part of the URL is a valid IP address or a domain.
+ *   - It does not contain potentially harmful content, such as SQL injection patterns or script tags.
+ *   - It does not attempt relative path traversal (e.g., '../').
  *
- * Example of a valid URL: https://www.example.com
+ * Example valid URL:
+ *   - https://www.example.com
+ *
+ * Example invalid URL:
+ *   - http://localhost (does not contain a valid domain or external host).
  *
  * @package HeroQR\DataTypes
  */
@@ -27,22 +34,18 @@ class Url extends AbstractDataType
     {
         $parsedUrl = parse_url($url);
 
-        if (!filter_var($url, FILTER_VALIDATE_URL) || !isset($parsedUrl['host'])) {
+        if (!filter_var($url, FILTER_VALIDATE_URL) || !isset($parsedUrl['host']) || empty($parsedUrl['host'])) {
             return false;
         }
 
-        if (!preg_match('/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $parsedUrl['host']) 
-            && !filter_var($parsedUrl['host'], FILTER_VALIDATE_IP)) {
+        if (
+            !preg_match('/^(https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]+(?:\/[^\s]*)?(\?[^\s]*)?(#\S*)?)$/i', $url)
+            && !filter_var($url, FILTER_VALIDATE_IP)
+        ) {
             return false;
         }
 
         if (self::hasSqlInjection($url) || self::hasScriptTag($url) || preg_match('/(\.\.\/)/', $url)) {
-            return false;
-        }
-
-        if (!filter_var($parsedUrl['host'], FILTER_VALIDATE_IP) 
-            && !checkdnsrr($parsedUrl['host'], 'A') 
-            && !checkdnsrr($parsedUrl['host'], 'CNAME')) {
             return false;
         }
 

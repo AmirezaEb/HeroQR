@@ -10,12 +10,12 @@ use InvalidArgumentException;
 class OutputManager implements OutputManagerInterface
 {
     /**
-     * Save the QR Code output to a file.
+     * Save the QR Code output to a file
      *
      * @param ResultInterface $builder
      * @param string $path
      * @return bool
-     * @throws InvalidArgumentException if the format is unsupported or saving fails.
+     * @throws InvalidArgumentException if the format is unsupported or saving fails
      */
     public function saveTo(ResultInterface $builder, string $path): bool
     {
@@ -31,12 +31,13 @@ class OutputManager implements OutputManagerInterface
             'application/postscript' => '.eps',
             'application/octet-stream' => '.bin',
             'text/plain' => '.bin',
-            default => throw new InvalidArgumentException('Unsupported format.'),
+            default => throw new InvalidArgumentException('Unsupported format'),
         };
 
         $fullPath = $path . $extension;
+        $builder->saveToFile($fullPath);
 
-        if (!$builder->saveToFile($fullPath) && !file_exists($fullPath)) {
+        if (!file_exists($fullPath)) {
             throw new InvalidArgumentException('Saving To File Failed');
         }
 
@@ -44,7 +45,7 @@ class OutputManager implements OutputManagerInterface
     }
 
     /**
-     * Return the data URI for the QR Code.
+     * Return the data URI for the QR Code
      *
      * @param ResultInterface $builder
      * @return string
@@ -55,7 +56,7 @@ class OutputManager implements OutputManagerInterface
     }
 
     /**
-     * Convert the QR Code matrix to a two-dimensional array.
+     * Convert the QR Code matrix to a two-dimensional array
      *
      * @param ResultInterface $builder
      * @return array
@@ -75,7 +76,7 @@ class OutputManager implements OutputManagerInterface
     }
 
     /**
-     * Return the QR Code matrix as a Matrix object.
+     * Return the QR Code matrix as a Matrix object
      *
      * @param ResultInterface $builder
      * @return Matrix
@@ -86,7 +87,7 @@ class OutputManager implements OutputManagerInterface
     }
 
     /**
-     * Return the QR Code output as a string.
+     * Return the QR Code output as a string
      *
      * @param ResultInterface $builder
      * @return string

@@ -1,6 +1,6 @@
 <?php
 
-namespace HeroQR\Tests\Managers;
+namespace HeroQR\Tests\Unit\Managers;
 
 use Exception;
 use InvalidArgumentException;

@@ -1,6 +1,6 @@
 <?php
 
-namespace HeroQR\Tests\DataTypes;
+namespace HeroQR\Tests\Unit\DataTypes;
 
 use HeroQR\DataTypes\Text;
 use PHPUnit\Framework\TestCase;
@@ -49,7 +49,7 @@ class TextTest extends TestCase
      * This text should fail the validation
      */
     #[Test]
-    public function testTextWithScriptAndSqlInjection(): void
+    public function isTextWithScriptAndSqlInjection(): void
     {
         $text = "<script>alert('XSS');</script>SELECT * FROM users WHERE id = 1; --";
         $result = Text::validate($text);

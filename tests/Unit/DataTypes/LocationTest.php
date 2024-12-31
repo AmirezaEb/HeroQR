@@ -1,6 +1,6 @@
 <?php
 
-namespace HeroQR\Tests\DataTypes;
+namespace HeroQR\Tests\Unit\DataTypes;
 
 use HeroQR\DataTypes\Location;
 use PHPUnit\Framework\TestCase;

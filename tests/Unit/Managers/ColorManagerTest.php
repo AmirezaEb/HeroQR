@@ -1,6 +1,6 @@
 <?php
 
-namespace HeroQR\Tests\Managers;
+namespace HeroQR\Tests\Unit\Managers;
 
 use PHPUnit\Framework\TestCase;
 use HeroQR\Managers\ColorManager;
@@ -29,7 +29,7 @@ class ColorManagerTest extends TestCase
      * Test that the default colors are set correctly in the ColorManager
      */
     #[Test]
-    public function defaultColors(): void
+    public function isGetdefaultColors(): void
     {
         $colorManager = $this->colorManager;
 
@@ -52,7 +52,7 @@ class ColorManagerTest extends TestCase
      * Test setting and retrieving a custom QR code color
      */
     #[Test]
-    public function setAndGetColor(): void
+    public function isSetAndGetColor(): void
     {
         $colorManager = $this->colorManager;
 
@@ -67,7 +67,7 @@ class ColorManagerTest extends TestCase
      * Test setting and retrieving a custom background color
      */
     #[Test]
-    public function setAndGetBackgroundColor(): void
+    public function isSetAndGetBackgroundColor(): void
     {
         $colorManager = $this->colorManager;
 
@@ -82,7 +82,7 @@ class ColorManagerTest extends TestCase
      * Test setting and retrieving a custom label color
      */
     #[Test]
-    public function setAndGetLabelColor(): void
+    public function isSetAndGetLabelColor(): void
     {
         $colorManager = $this->colorManager;
 
@@ -97,7 +97,7 @@ class ColorManagerTest extends TestCase
      * Test the behavior of the hex2rgb method with an invalid hex color
      */
     #[Test]
-    public function hex2RgbInvalidColor(): void
+    public function isHex2RgbInvalidColor(): void
     {
         $colorManager = $this->colorManager;
 

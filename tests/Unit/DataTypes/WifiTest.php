@@ -1,6 +1,6 @@
 <?php
 
-namespace HeroQR\Tests\DataTypes;
+namespace HeroQR\Tests\Unit\DataTypes;
 
 use HeroQR\DataTypes\Wifi;
 use PHPUnit\Framework\TestCase;
@@ -40,6 +40,16 @@ class WifiTest extends TestCase
     {
         $wifiString = 'WIFI:T:nopass;S:MyNetwork;P:;';
         $this->assertTrue(Wifi::validate($wifiString), 'Valid nopass Wi-Fi string should pass');
+    }
+
+    /**
+     * Test valid WEP Wi-Fi string with a valid password length
+     */
+    #[Test]
+    public function isValidWifiWithNoPasswordForWep(): void
+    {
+        $wifiString = 'WIFI:T:WEP;S:MyNetwork;P:1234567890;';
+        $this->assertTrue(Wifi::validate($wifiString), 'WEP Wi-Fi string with valid password length should pass');
     }
 
     /**
@@ -93,15 +103,5 @@ class WifiTest extends TestCase
 
         $wifiString = 'WIFI:T:WEP;S:MyNetwork;P:1234567890123456789012345678901234;';
         $this->assertFalse(Wifi::validate($wifiString), 'WEP Wi-Fi string with a too long password should fail');
-    }
-
-    /**
-     * Test valid WEP Wi-Fi string with a valid password length
-     */
-    #[Test]
-    public function isValidWifiWithNoPasswordForWep(): void
-    {
-        $wifiString = 'WIFI:T:WEP;S:MyNetwork;P:1234567890;';
-        $this->assertTrue(Wifi::validate($wifiString), 'WEP Wi-Fi string with valid password length should pass');
     }
 }
