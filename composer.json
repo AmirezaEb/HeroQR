@@ -2,15 +2,18 @@
     "name": "amirezaeb/heroqr",
     "description": "A Powerful QR Code Management Library For PHP",
     "keywords": [
-        "AmirezaEb",
-        "qrcode",
         "qr",
-        "management",
+        "php",
         "code",
-        "php"
+        "qrcode",
+        "HeroQR",
+        "laravel",
+        "qr-codes",
+        "AmirezaEb",
+        "management",
+        "php-library"
     ],
     "homepage": "https://github.com/AmirezaEb/HeroQR",
-    "version": "1.0.4",
     "type": "library",
     "license": "MIT",
     "authors": [

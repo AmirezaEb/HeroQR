@@ -2,21 +2,21 @@
 
 namespace HeroQR\Core;
 
+use RuntimeException;
+use InvalidArgumentException;
+use HeroQR\DataTypes\DataType;
+use HeroQR\Managers\LogoManager;
+use Endroid\QrCode\Matrix\Matrix;
+use HeroQR\Managers\LabelManager;
+use HeroQR\Managers\ColorManager;
+use HeroQR\Managers\OutputManager;
+use Endroid\QrCode\Builder\Builder;
+use HeroQR\Managers\EncodingManager;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Color\ColorInterface;
+use Endroid\QrCode\Writer\WriterInterface;
 use HeroQR\Contracts\QRCodeGeneratorInterface;
 use Endroid\QrCode\Writer\Result\ResultInterface;
-use Endroid\QrCode\Writer\WriterInterface;
-use Endroid\QrCode\Color\ColorInterface;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use HeroQR\Managers\EncodingManager;
-use Endroid\QrCode\Builder\Builder;
-use HeroQR\Managers\OutputManager;
-use HeroQR\Managers\ColorManager;
-use HeroQR\Managers\LabelManager;
-use Endroid\QrCode\Matrix\Matrix;
-use HeroQR\Managers\LogoManager;
-use HeroQR\DataTypes\DataType;
-use InvalidArgumentException;
-use RuntimeException;
 
 /**
  * Class QRCodeGenerator
@@ -32,14 +32,14 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * Initializes the necessary services and sets default values for QR code properties
      *
      * @param string $outputFormat The output format (default is 'getDataUri')
-     * @param int $size The size of the QR code (default is 200)
+     * @param int $size The size of the QR code (default is 300)
      * @param int $margin The margin around the QR code (default is 10)
      * @param LogoManager $logoManager The logo manager instance
      * @param ColorManager $colorManager The color manager instance
      * @param EncodingManager $encodingManager The encoding manager instance
      */
     public function __construct(
-        private int $size = 200,
+        private int $size = 300,
         private int $margin = 10,
         private string $data = '',
         private string $outputFormat = 'getDataUri',
@@ -64,14 +64,17 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     /**
      * Generates a QR code based on the specified output format
      *
-     * @param string $format The desired format for the QR code ('gif', 'png', 'svg', 'webp', 'eps', 'pdf', 'binary')
+     * @param string $format The desired format for the Normal QR code('gif', 'png', 'svg', 'webp', 'eps', 'pdf', 'binary')
+     * @param string $format The desired format for the Custom QR code('png-M(1-3)-C(1-3)')
      * @return self The current QRCodeGenerator instance for method chaining
      * @throws InvalidArgumentException If the specified format is not supported
      */
-    public function generate(string $format): self
+    public function generate(string $format = 'png'): self
     {
         $this->builder = (new Builder(
             writer: $this->validateWriter($format),
+            writerOptions: [],
+            validateResult: false,
             data: $this->data,
             encoding: $this->encodingManager->getEncoding(),
             errorCorrectionLevel: ErrorCorrectionLevel::Medium,
@@ -79,15 +82,15 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
             margin: $this->margin,
             foregroundColor: $this->colorManager->getColor(),
             backgroundColor: $this->colorManager->getBackgroundColor(),
+            labelText: $this->labelManager->getLabel(),
+            labelFont: $this->labelManager->getLabelFont(),
+            labelAlignment: $this->labelManager->getLabelAlign(),
+            labelMargin: $this->labelManager->getLabelMargin(),
+            labelTextColor: $this->labelManager->getLabelColor(),
             logoPath: $this->logoManager->getLogoPath(),
             logoResizeToWidth: $this->logoManager->getLogoSize(),
             logoResizeToHeight: $this->logoManager->getLogoSize(),
             logoPunchoutBackground: $this->logoManager->getLogoBackground(),
-            labelText: $this->labelManager->getLabel(),
-            labelFont: $this->labelManager->getLabelFont(),
-            labelTextColor: $this->labelManager->getLabelColor(),
-            labelAlignment: $this->labelManager->getLabelAlign(),
-            labelMargin: $this->labelManager->getLabelMargin(),
         ))->build();
 
         return $this;
@@ -417,6 +420,17 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      */
     private function validateWriter(string $format): WriterInterface
     {
+        if (preg_match('/^(\w+)-(M\d{1,2})-(C\d{1,2})$/i', $format, $matches)) {
+
+            $customWriterClass = 'HeroQR\Core\Writers\Custom' . ucfirst($matches[1]) . 'Writer';
+
+            if (!class_exists($customWriterClass)) {
+                throw new InvalidArgumentException(sprintf('Custom Format "%s" Does Not Exist', $format));
+            }
+
+            return new $customWriterClass($matches[2], $matches[3]);
+        }
+
         if ($format === 'pdf' && !class_exists('FPDF')) {
             throw new RuntimeException('The library "<a href="https://github.com/Setasign/FPDF" target="_blank" style="text-decoration: none;">setasign/fpdf</a>" is required for PDF generation. Please install it using "composer require setasign/fpdf".');
         }
@@ -428,9 +442,11 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         }
 
         $writer = new $writerClass();
+
         if (!$writer instanceof WriterInterface) {
             throw new InvalidArgumentException(sprintf('Format "%s" Is Not Supported', $format));
         }
+
         return $writer;
     }
 
