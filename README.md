@@ -43,7 +43,7 @@ HeroQR is an advanced and modular PHP library designed to simplify the creation,
 - **Data Validation :** The library supports validation for various data types, including URL, text, email, phone number, IP, and Wi-Fi, ensuring the accuracy of input data.
 
 - **Flexible Export Options :** Save QR codes in multiple formats, including PDF, SVG, PNG, Binary, GIF, EPS, and WebP. If you don't require custom markers or cursors, you can choose from these formats for your output.
-- 
+
 - **Framework Ready :** Seamlessly integrates with frameworks like Laravel, making it a perfect fit for modern applications.
 
 ## Installation
