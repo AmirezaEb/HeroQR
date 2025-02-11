@@ -2,11 +2,11 @@
 
 namespace HeroQR\Tests\Integration;
 
-use PHPUnit\Framework\Attributes\Test;
-use HeroQR\Core\QRCodeGenerator;
-use PHPUnit\Framework\TestCase;
-use HeroQR\DataTypes\DataType;
 use InvalidArgumentException;
+use HeroQR\DataTypes\DataType;
+use PHPUnit\Framework\TestCase;
+use HeroQR\Core\QRCodeGenerator;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class LogoQRCodeTest

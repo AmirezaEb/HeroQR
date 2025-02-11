@@ -9,6 +9,7 @@ use HeroQR\Managers\LogoManager;
 use Endroid\QrCode\Matrix\Matrix;
 use HeroQR\Managers\LabelManager;
 use HeroQR\Managers\ColorManager;
+use HeroQR\Managers\WriterManager;
 use HeroQR\Managers\OutputManager;
 use Endroid\QrCode\Builder\Builder;
 use HeroQR\Managers\EncodingManager;
@@ -19,9 +20,16 @@ use HeroQR\Contracts\QRCodeGeneratorInterface;
 use Endroid\QrCode\Writer\Result\ResultInterface;
 
 /**
- * Class QRCodeGenerator
- * Handles the generation of QR codes with customizable options
+ * Handles the generation of QR codes with customizable options.
+ * 
+ * Provides functionality for generating QR codes in various formats
+ * (PNG, SVG, PDF and More) with optional customization options such as shapes,
+ * markers, and internal patterns. Ensures flexibility and ease of use 
+ * for both standard and advanced use cases.
+ * 
+ * @package HeroQR/Core
  */
+
 class QRCodeGenerator implements QrCodeGeneratorInterface
 {
     private ResultInterface $builder;
@@ -32,21 +40,22 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * Initializes the necessary services and sets default values for QR code properties
      *
      * @param string $outputFormat The output format (default is 'getDataUri')
-     * @param int $size The size of the QR code (default is 300)
+     * @param int $size The size of the QR code (default is 800)
      * @param int $margin The margin around the QR code (default is 10)
      * @param LogoManager $logoManager The logo manager instance
      * @param ColorManager $colorManager The color manager instance
      * @param EncodingManager $encodingManager The encoding manager instance
      */
     public function __construct(
-        private int $size = 300,
+        private int $size = 800,
         private int $margin = 10,
         private string $data = '',
         private string $outputFormat = 'getDataUri',
         private LogoManager $logoManager = new LogoManager(),
         private ColorManager $colorManager = new ColorManager(),
-        private EncodingManager $encodingManager = new EncodingManager(),
-        private OutputManager $OutputManager = new OutputManager()
+        private WriterManager $writerManager = new WriterManager(),
+        private OutputManager $OutputManager = new OutputManager(),
+        private EncodingManager $encodingManager = new EncodingManager()
     ) {
         $this->labelManager = new LabelManager($this->colorManager);
     }
@@ -62,22 +71,33 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Generates a QR code based on the specified output format
+     * Generates a QR code in the specified format with optional customization.
      *
-     * @param string $format The desired format for the Normal QR code('gif', 'png', 'svg', 'webp', 'eps', 'pdf', 'binary')
-     * @param string $format The desired format for the Custom QR code('png-M(1-3)-C(1-3)')
-     * @return self The current QRCodeGenerator instance for method chaining
-     * @throws InvalidArgumentException If the specified format is not supported
+     * @param string $format The desired format for the QR code ('gif', 'png', 'svg', 'webp', 'eps', 'pdf', 'binary').
+     * @param array $customs Optional customization parameters for the QR code. If provided, they must follow this structure:
+     * - 'Shape' ('S1' to 'S4'): Defines the overall shape of the QR code.
+     * - 'Marker' ('M1' to 'M4'): Specifies the corner marker styles.
+     * - 'Cursor' ('C1' to 'C4'): Adjusts the internal patterns.
+     * - Example:
+     * - generate('png', [
+     *  'Shape' => 'S4',
+     *  'Marker' => 'M4',
+     *  'Cursor' => 'C4'
+     *  ]);
+     *
+     * @return self The current QRCodeGenerator instance for method chaining.
+     * @throws InvalidArgumentException If the specified format is not supported.
      */
-    public function generate(string $format = 'png'): self
+
+    public function generate(string $format = 'png', array $customs = []): self
     {
         $this->builder = (new Builder(
-            writer: $this->validateWriter($format),
+            writer: $this->validateWriter($format, $customs),
             writerOptions: [],
             validateResult: false,
             data: $this->data,
             encoding: $this->encodingManager->getEncoding(),
-            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
             size: $this->size,
             margin: $this->margin,
             foregroundColor: $this->colorManager->getColor(),
@@ -309,11 +329,11 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * Set the logo to be embedded in the QR code
      *
      * @param string $logoPath The path to the logo file
-     * @param int $logoSize The size of the logo
+     * @param int $logoSize The size of the logo (default is 80)
      * @return self
      * @throws InvalidArgumentException If the logo file does not exist
      */
-    public function setLogo(string $logoPath, int $logoSize = 40): self
+    public function setLogo(string $logoPath, int $logoSize = 80): self
     {
         if (!file_exists($logoPath)) {
             throw new InvalidArgumentException('Logo File Does Not Exist');
@@ -340,7 +360,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * @param string $label The text label to be displayed on the QR code
      * @param string $textAlign The text alignment for the label (default is 'center')
      * @param string $textColor The color of the label text in hexadecimal format (default is '#000000')
-     * @param int $fontSize The font size of the label text (default is 20)
+     * @param int $fontSize The font size of the label text (default is 50)
      * @param array $margin The margin around the label in the format [top, right, bottom, left] (default is [0, 10, 10, 10])
      * @return self Returns the current instance for method chaining
      * @throws InvalidArgumentException If the label text is empty
@@ -349,7 +369,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         string $label,
         string $textAlign = 'center',
         string $textColor = '#000000',
-        int $fontSize = 20,
+        int $fontSize = 50,
         array $margin = [0, 10, 10, 10]
     ): self {
         if (empty($label)) {
@@ -412,42 +432,17 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Helper method to validate the writer for the given format
+     * Validates the writer format and returns an appropriate WriterInterface instance
+     * Supports both standard and custom writer formats
      *
-     * @param string $format The format to validate
-     * @return WriterInterface The writer interface instance for the specified format
-     * @throws InvalidArgumentException If the format is invalid
+     * @param string $format  The format of the writer ("svg", "png", "pdf",and more...)
+     * @param array $customs  An optional array of custom values for M Or C Or S
+     * @return WriterInterface
+     * @throws InvalidArgumentException|RuntimeException
      */
-    private function validateWriter(string $format): WriterInterface
+    private function validateWriter(string $format, array $customs = ['S1', 'M1', 'C1']): WriterInterface
     {
-        if (preg_match('/^(\w+)-(M\d{1,2})-(C\d{1,2})$/i', $format, $matches)) {
-
-            $customWriterClass = 'HeroQR\Core\Writers\Custom' . ucfirst($matches[1]) . 'Writer';
-
-            if (!class_exists($customWriterClass)) {
-                throw new InvalidArgumentException(sprintf('Custom Format "%s" Does Not Exist', $format));
-            }
-
-            return new $customWriterClass($matches[2], $matches[3]);
-        }
-
-        if ($format === 'pdf' && !class_exists('FPDF')) {
-            throw new RuntimeException('The library "<a href="https://github.com/Setasign/FPDF" target="_blank" style="text-decoration: none;">setasign/fpdf</a>" is required for PDF generation. Please install it using "composer require setasign/fpdf".');
-        }
-
-        $writerClass = 'Endroid\QrCode\Writer\\' . ucfirst($format) . 'Writer';
-
-        if (!class_exists($writerClass)) {
-            throw new InvalidArgumentException(sprintf('Format "%s" Does Not Exist', $format));
-        }
-
-        $writer = new $writerClass();
-
-        if (!$writer instanceof WriterInterface) {
-            throw new InvalidArgumentException(sprintf('Format "%s" Is Not Supported', $format));
-        }
-
-        return $writer;
+        return $this->writerManager->getWriter($format, $customs);
     }
 
     /**

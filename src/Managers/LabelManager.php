@@ -2,30 +2,33 @@
 
 namespace HeroQR\Managers;
 
-use Endroid\QrCode\Label\Margin\MarginInterface;
-use Endroid\QrCode\Label\Font\FontInterface;
-use HeroQR\Contracts\Managers\LabelManagerInterface;
-use Endroid\QrCode\Color\ColorInterface;
-use Endroid\QrCode\Label\LabelAlignment;
+use InvalidArgumentException;
 use Endroid\QrCode\Label\Font\OpenSans;
 use Endroid\QrCode\Label\Margin\Margin;
-use InvalidArgumentException;
+use Endroid\QrCode\Color\ColorInterface;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\Label\Font\FontInterface;
+use Endroid\QrCode\Label\Margin\MarginInterface;
+use HeroQR\Contracts\Managers\LabelManagerInterface;
 
 /**
- * Class LabelManager
- * Manages label settings such as font, color, text, margin, and alignment for the QR code label.
+ * Manages the settings for QR code labels, including font, color, text, margin, and alignment
+ * Provides customization options for the appearance and positioning of QR code labels
+ *
+ * @package HeroQR\Managers
  */
+
 class LabelManager implements LabelManagerInterface
 {
     private string $label = '';
 
     /**
-     * LabelManager constructor.
+     * LabelManager constructor
      * 
-     * @param ColorManager $labelColor The color manager instance to handle label colors.
-     * @param MarginInterface $labelMargin The margin settings for the label (default: [0, 10, 10, 10]).
-     * @param FontInterface $labelFont The font for the label text (default: OpenSans with size 20).
-     * @param LabelAlignment $labelAlign The alignment for the label (default: center).
+     * @param ColorManager $labelColor The color manager instance to handle label colors
+     * @param MarginInterface $labelMargin The margin settings for the label (default: [0, 10, 10, 10])
+     * @param FontInterface $labelFont The font for the label text (default: OpenSans with size 50)
+     * @param LabelAlignment $labelAlign The alignment for the label (default: center)
      */
     public function __construct(
         private ColorManager $labelColor,
@@ -35,10 +38,10 @@ class LabelManager implements LabelManagerInterface
     ) {}
 
     /**
-     * Set the label text.
+     * Set the label text
      * 
-     * @param string $label The text to display on the label.
-     * @throws InvalidArgumentException If the label text is empty or too long.
+     * @param string $label The text to display on the label
+     * @throws InvalidArgumentException If the label text is empty or too long
      */
     public function setLabel(string $label): void
     {
@@ -54,9 +57,9 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Get the current label text.
+     * Get the current label text
      * 
-     * @return string The label text.
+     * @return string The label text
      */
     public function getLabel(): string
     {
@@ -64,9 +67,9 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Get the font used for the label.
+     * Get the font used for the label
      * 
-     * @return FontInterface The font used for the label text.
+     * @return FontInterface The font used for the label text
      */
     public function getLabelFont(): FontInterface
     {
@@ -74,10 +77,10 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Set the font size for the label.
+     * Set the font size for the label
      * 
-     * @param int $size The font size to apply.
-     * @throws InvalidArgumentException If the size is not a positive integer.
+     * @param int $size The font size to apply
+     * @throws InvalidArgumentException If the size is not a positive integer
      */
     public function setLabelSize(int $size): void
     {
@@ -89,10 +92,10 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Set the alignment for the label.
+     * Set the alignment for the label
      * 
-     * @param string $labelAlign The alignment (left, center, or right).
-     * @throws InvalidArgumentException If an invalid alignment is provided.
+     * @param string $labelAlign The alignment (left, center, or right)
+     * @throws InvalidArgumentException If an invalid alignment is provided
      */
     public function setLabelAlign(string $labelAlign): void
     {
@@ -105,9 +108,9 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Get the current label alignment.
+     * Get the current label alignment
      * 
-     * @return LabelAlignment The current label alignment.
+     * @return LabelAlignment The current label alignment
      */
     public function getLabelAlign(): LabelAlignment
     {
@@ -115,10 +118,10 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Set the label color.
+     * Set the label color
      * 
-     * @param string $color The color in hex format (e.g., "#FF5733").
-     * @throws InvalidArgumentException If the color format is invalid.
+     * @param string $color The color in hex format ('#000000FF', '#FF5733')
+     * @throws InvalidArgumentException If the color format is invalid
      */
     public function setLabelColor(string $hexColor): void
     {
@@ -130,9 +133,9 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Get the current label color.
+     * Get the current label color
      * 
-     * @return ColorInterface The current label color.
+     * @return ColorInterface The current label color
      */
     public function getLabelColor(): ColorInterface
     {
@@ -140,10 +143,10 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Set the label margin.
+     * Set the label margin
      * 
-     * @param array $margin An array of margin values [top, right, bottom, left].
-     * @throws InvalidArgumentException If the margin array does not contain exactly 4 values.
+     * @param array $margin An array of margin values [top, right, bottom, left]
+     * @throws InvalidArgumentException If the margin array does not contain exactly 4 values
      */
     public function setLabelMargin(array $margin): void
     {
@@ -166,9 +169,9 @@ class LabelManager implements LabelManagerInterface
 
 
     /**
-     * Get the current label margin.
+     * Get the current label margin
      * 
-     * @return MarginInterface The current label margin.
+     * @return MarginInterface The current label margin
      */
     public function getLabelMargin(): MarginInterface
     {
@@ -176,10 +179,10 @@ class LabelManager implements LabelManagerInterface
     }
 
     /**
-     * Helper method to validate if a hex color is valid.
+     * Helper method to validate if a hex color is valid
      *
-     * @param string $hexColor The color code to validate.
-     * @return bool True if the color code is valid, false otherwise.
+     * @param string $hexColor The color code to validate
+     * @return bool True if the color code is valid, false otherwise
      */
     private function isValidHexColor(string $hexColor): bool
     {

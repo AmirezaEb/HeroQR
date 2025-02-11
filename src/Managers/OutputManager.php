@@ -2,10 +2,18 @@
 
 namespace HeroQR\Managers;
 
-use HeroQR\Contracts\Managers\OutputManagerInterface;
-use Endroid\QrCode\Writer\Result\ResultInterface;
-use Endroid\QrCode\Matrix\Matrix;
 use InvalidArgumentException;
+use Endroid\QrCode\Matrix\Matrix;
+use Endroid\QrCode\Writer\Result\ResultInterface;
+use HeroQR\Contracts\Managers\OutputManagerInterface;
+
+/**
+ * Handles QR Code output operations, including:
+ * saving to files, generating data URIs, retrieving matrices,
+ * and converting outputs to strings
+ * 
+ * @package HeroQR\Managers
+ */
 
 class OutputManager implements OutputManagerInterface
 {

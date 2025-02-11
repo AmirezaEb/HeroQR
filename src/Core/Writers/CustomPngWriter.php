@@ -6,12 +6,16 @@ use Endroid\QrCode\QrCodeInterface;
 use Endroid\QrCode\Logo\LogoInterface;
 use Endroid\QrCode\Label\LabelInterface;
 use Endroid\QrCode\Writer\Result\PngResult;
-use Endroid\QrCode\Writer\Result\ResultInterface;
 use HeroQR\Contracts\Customs\AbstractWriter;
+use Endroid\QrCode\Writer\Result\ResultInterface;
 
 /**
  * Custom PNG Writer for generating QR codes with optional compression level
+ * Allows for customized QR code generation with flexible compression settings
+ * 
+ * @package HeroQR\Writers
  */
+
 readonly class CustomPngWriter extends AbstractWriter
 {
     public const WRITER_OPTION_COMPRESSION_LEVEL = 'compression_level';
@@ -34,7 +38,7 @@ readonly class CustomPngWriter extends AbstractWriter
     ): ResultInterface {
 
         $options[self::WRITER_OPTION_COMPRESSION_LEVEL] = $options[self::WRITER_OPTION_COMPRESSION_LEVEL] ?? 1;
-
+        
         /** 
          * @var GdResult $gdResult 
          */

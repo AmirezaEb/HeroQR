@@ -2,24 +2,27 @@
 
 namespace HeroQR\Managers;
 
-use HeroQR\Contracts\Managers\LogoManagerInterface;
 use InvalidArgumentException;
+use HeroQR\Contracts\Managers\LogoManagerInterface;
 
 /**
- * Class LogoManager
- * Manages logo settings such as path, size, and background visibility for QR codes.
+ * Manages logo-related settings for QR code integration, including file path, size, and background options
+ * Provides methods to set and retrieve logo properties for customization
+ * 
+ * @package HeroQR\Managers
  */
+
 class LogoManager implements LogoManagerInterface
 {
     private string $logoPath = '';
-    private int $logoSize = 40;
+    private int $logoSize = 80;
     private bool $logoBackground = false;
 
     /**
-     * Set the logo path.
+     * Set the logo path
      * 
-     * @param string $logoPath The file path to the logo.
-     * @throws InvalidArgumentException If the file does not exist or is not readable.
+     * @param string $logoPath The file path to the logo
+     * @throws InvalidArgumentException If the file does not exist or is not readable
      */
     public function setLogo(string $logoPath): void
     {
@@ -31,9 +34,9 @@ class LogoManager implements LogoManagerInterface
     }
 
     /**
-     * Get the current logo path.
+     * Get the current logo path
      * 
-     * @return string The logo file path.
+     * @return string The logo file path
      */
     public function getLogoPath(): string
     {
@@ -41,9 +44,9 @@ class LogoManager implements LogoManagerInterface
     }
 
     /**
-     * Set whether the logo should have a background.
+     * Set whether the logo should have a background
      * 
-     * @param bool $logoBackground True if the logo should have a background, false otherwise.
+     * @param bool $logoBackground True if the logo should have a background, false otherwise
      */
     public function setLogoBackground(bool $logoBackground): void
     {
@@ -51,9 +54,9 @@ class LogoManager implements LogoManagerInterface
     }
 
     /**
-     * Get the current logo background setting.
+     * Get the current logo background setting
      * 
-     * @return bool True if the logo has a background, false otherwise.
+     * @return bool True if the logo has a background, false otherwise
      */
     public function getLogoBackground(): bool
     {
@@ -61,10 +64,10 @@ class LogoManager implements LogoManagerInterface
     }
 
     /**
-     * Set the logo size.
+     * Set the logo size
      * 
-     * @param int $size The size of the logo.
-     * @throws InvalidArgumentException If the size is not a positive integer.
+     * @param int $size The size of the logo
+     * @throws InvalidArgumentException If the size is not a positive integer
      */
     public function setLogoSize(int $size): void
     {
@@ -76,9 +79,9 @@ class LogoManager implements LogoManagerInterface
     }
 
     /**
-     * Get the current logo size.
+     * Get the current logo size
      * 
-     * @return int The size of the logo.
+     * @return int The size of the logo
      */
     public function getLogoSize(): int
     {

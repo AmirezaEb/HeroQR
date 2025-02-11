@@ -41,7 +41,7 @@ class ImageOverlayTest extends TestCase
     public function isConstructorWithInvalidKeys(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid Custom Marker Or Custom Cursor');
+        $this->expectExceptionMessageMatches('/Invalid key \'.+\' provided. Valid keys are : .+/');
 
         new ImageOverlay('InvalidKey', 'AnotherInvalidKey', []);
     }

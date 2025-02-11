@@ -11,12 +11,12 @@ use HeroQR\Contracts\Customs\AbstractCustomPaths;
  * @package HeroQR\Customs
  */
 
-class MarkerPaths extends AbstractCustomPaths
+class ShapePaths extends AbstractCustomPaths
 {
-    public const M1 = __DIR__ . '/../../assets/Markers/Marker-1.png';
-    public const M2 = __DIR__ . '/../../assets/Markers/Marker-2.png';
-    public const M3 = __DIR__ . '/../../assets/Markers/Marker-3.png';
-    public const M4 = __DIR__ . '/../../assets/Markers/Marker-4.png';
+    public const S1 = 'drawSquare';
+    public const S2 = 'drawCircle';
+    public const S3 = 'drawStar';
+    public const S4 = 'drawDiamond';
 
     /**
      * Retrieves all marker paths as an associative array
@@ -28,7 +28,7 @@ class MarkerPaths extends AbstractCustomPaths
 
         $paths = [];
         foreach ($constants as $key => $value) {
-            if (strpos($key, 'M') === 0) {
+            if (strpos($key, 'S') === 0) {
                 $paths[$key] = $value;
             }
         }

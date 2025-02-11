@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\HeroQR\Integration;
+namespace HeroQR\Tests\Integration;
 
-use PHPUnit\Framework\Attributes\Test;
-use HeroQR\Core\QRCodeGenerator;
-use PHPUnit\Framework\TestCase;
-use HeroQR\DataTypes\DataType;
 use InvalidArgumentException;
+use HeroQR\DataTypes\DataType;
+use PHPUnit\Framework\TestCase;
+use HeroQR\Core\QRCodeGenerator;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Class StyledQRCodeTest
@@ -114,5 +114,141 @@ class StyledQRCodeTest extends TestCase
         $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
 
         $this->qrCodeGenerator->generate('png');
+    }
+
+    /**
+     * Test for QR code generation with custom markers
+     */
+    #[Test]
+    public function isQrcodeWithCustomMarkers(): void
+    {
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', ['Marker' => 'M' . mt_rand(1, 4)]);
+        $this->qrCodeGenerator->saveTo($this->outputPath);
+
+        $this->assertFileExists($this->outputPath . '.png');
+        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
+
+        unlink($this->outputPath . '.png');
+    }
+
+    /** 
+     * Test for QR code generation with invalid custom markers
+     */
+    #[Test]
+    public function isQrcodeWithInvalidCustomMarkers(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', ['Marker' => 'M5']);
+    }
+
+    /**
+     * Test for QR code generation with custom cursors
+     */
+    #[Test]
+    public function isQrcodeWithCustomCursors(): void
+    {
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', ['Cursor' => 'C' . mt_rand(1, 4)]);
+        $this->qrCodeGenerator->saveTo($this->outputPath);
+
+        $this->assertFileExists($this->outputPath . '.png');
+        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
+
+        unlink($this->outputPath . '.png');
+    }
+
+    /**
+     * Test for QR code generation with invalid custom cursors 
+     */
+    #[Test]
+    public function isQrcodeWithInvalidCustomCursors(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', ['Cursor' => 'C5']);
+    }
+
+    /**
+     * Test for QR code generation with custom shapes
+     * */
+    #[Test]
+    public function isQrcodeWithCustomShapes(): void
+    {
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', ['Shape' => 'S2']);
+        $this->qrCodeGenerator->saveTo($this->outputPath);
+
+        $this->assertFileExists($this->outputPath . '.png');
+        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
+
+        unlink($this->outputPath . '.png');
+    }
+
+    /**
+     * Test for QR code generation with invalid custom shapes
+     */
+    #[Test]
+    public function isQrcodeWithInvalidCustomShapes(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', ['Shape' => 'S5']);
+    }
+
+    /** Test for QR code generation with custom shape, cursor, and marker
+     * 
+     */
+    #[Test]
+    public function isQrcodeWithCustomShapeAndCursorAndMarker(): void
+    {
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', [
+            'Shape' => 'S2',
+            'Cursor' => 'C2',
+            'Marker' => 'M2'
+        ]);
+        $this->qrCodeGenerator->saveTo($this->outputPath);
+
+        $this->assertFileExists($this->outputPath . '.png');
+        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
+
+        unlink($this->outputPath . '.png');
+    }
+
+    /**
+     * Test for QR code generation with invalid custom shape, cursor, and marker
+     */
+    #[Test]
+    public function isQrcodeWithInvalidCustomShapeAndCursorAndMarker(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(30);
+        $this->qrCodeGenerator->generate('png', [
+            'Shape' => 'S5',
+            'Cursor' => 'C5',
+            'Marker' => 'M5'
+        ]);
     }
 }

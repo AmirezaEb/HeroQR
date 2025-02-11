@@ -6,29 +6,37 @@ use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Color\ColorInterface;
 use HeroQR\Contracts\Managers\ColorManagerInterface;
 
+/**
+ * Manages the foreground, background, and label colors for QR codes
+ * Allows setting and getting colors in hexadecimal format and converts them to RGB or RGBA values
+ * The class ensures proper handling of colors for the QR code, including support for alpha transparency
+ *
+ * @package HeroQR\Managers
+ */
+
 class ColorManager implements ColorManagerInterface
 {
     /**
-     * ColorManager constructor.
+     * ColorManager constructor
      * 
-     * Initializes default colors for the QR code: color (black), background (white), and label (black).
+     * Initializes default colors for the QR code: color (black), background (white), and label (black)
      * 
-     * @param ColorInterface $color Default color of the QR code (black).
-     * @param ColorInterface $backgroundColor Default background color of the QR code (white).
-     * @param ColorInterface $labelColor Default label color (black).
+     * @param ColorInterface $color Default color of the QR code (black)
+     * @param ColorInterface $backgroundColor Default background color of the QR code (white)
+     * @param ColorInterface $labelColor Default label color (black)
      */
     public function __construct(
         private ColorInterface $color = new Color(0, 0, 0, 0), # Default black
         private ColorInterface $backgroundColor = new Color(255, 255, 255, 0), # Default white
-        private ColorInterface $labelColor = new Color(0, 0, 0, 0), # Default white
+        private ColorInterface $labelColor = new Color(0, 0, 0, 0), # Default black
     ) {}
 
     /**
-     * Set the foreground color of the QR code.
+     * Set the foreground color of the QR code
      * 
-     * Converts the provided hex color string to an RGB value and assigns it to the QR code's color property.
+     * Converts the provided hex color string to an RGB value and assigns it to the QR code's color property
      *
-     * @param string $hexColor The hex color string ( #ff0000).
+     * @param string $hexColor The hex color string ( #ff0000,'#ffffffFF')
      */
     public function setColor(string $hexColor): void
     {
@@ -36,9 +44,9 @@ class ColorManager implements ColorManagerInterface
     }
 
     /**
-     * Get the foreground color of the QR code.
+     * Get the foreground color of the QR code
      * 
-     * @return ColorInterface The current color of the QR code.
+     * @return ColorInterface The current color of the QR code
      */
     public function getColor(): ColorInterface
     {
@@ -46,11 +54,11 @@ class ColorManager implements ColorManagerInterface
     }
 
     /**
-     * Set the background color of the QR code.
+     * Set the background color of the QR code
      * 
-     * Converts the provided hex color string to an RGB value and assigns it to the QR code's background color property.
+     * Converts the provided hex color string to an RGB value and assigns it to the QR code's background color property
      *
-     * @param string $hexColor The hex color string ( #ffffff).
+     * @param string $hexColor The hex color string ( #ffffff,#ffffffFF)
      */
     public function setBackgroundColor(string $hexColor): void
     {
@@ -58,9 +66,9 @@ class ColorManager implements ColorManagerInterface
     }
 
     /**
-     * Get the background color of the QR code.
+     * Get the background color of the QR code
      * 
-     * @return ColorInterface The current background color of the QR code.
+     * @return ColorInterface The current background color of the QR code
      */
     public function getBackgroundColor(): ColorInterface
     {
@@ -68,11 +76,11 @@ class ColorManager implements ColorManagerInterface
     }
 
     /**
-     * Set the label color of the QR code.
+     * Set the label color of the QR code
      * 
-     * Converts the provided hex color string to an RGB value and assigns it to the QR code's label color property.
+     * Converts the provided hex color string to an RGB value and assigns it to the QR code's label color property
      *
-     * @param string $hexColor The hex color string ( #000000).
+     * @param string $hexColor The hex color string ( #000000)
      */
     public function setLabelColor(string $hexColor): void
     {
@@ -80,9 +88,9 @@ class ColorManager implements ColorManagerInterface
     }
 
     /**
-     * Get the label color of the QR code.
+     * Get the label color of the QR code
      * 
-     * @return ColorInterface The current label color of the QR code.
+     * @return ColorInterface The current label color of the QR code
      */
     public function getLabelColor(): ColorInterface
     {
@@ -90,13 +98,13 @@ class ColorManager implements ColorManagerInterface
     }
 
     /**
-     * Convert a hex color string to RGB format.
+     * Convert a hex color string to RGB format
      * 
-     * If the hex color includes an alpha component, it converts it to an appropriate value between 0 and 127 for use with GD functions.
+     * If the hex color includes an alpha component, it converts it to an appropriate value between 0 and 127 for use with GD functions
      * 
-     * @param string $hexColor The hex color string, optionally with an alpha channel (e.g., #ff0000ff).
+     * @param string $hexColor The hex color string, optionally with an alpha channel (#000000, #ff0000ff)
      * 
-     * @return ColorInterface The corresponding Color object with RGB and alpha values.
+     * @return ColorInterface The corresponding Color object with RGB and alpha values
      */
     private function hex2rgb(string $hexColor): ColorInterface
     {

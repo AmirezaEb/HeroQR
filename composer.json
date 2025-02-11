@@ -42,14 +42,14 @@
         "setasign/fpdf": "Required for PDF generation features",
         "ext-gd": "Required for image processing, including generating PNG images"
     },
-    "require-dev": {
-        "phpunit/phpunit": "^11.4"
-    },
     "extra": {
         "laravel": {
             "providers": [
                 "HeroQR\\Providers\\HeroQRServiceProvider"
             ]
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
     }
 }

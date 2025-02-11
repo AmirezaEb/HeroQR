@@ -8,6 +8,8 @@ use GdImage;
 /**
  * A class that overlays a background image with a custom cursor image, providing functionality 
  * to save, display, or return the result as a base64 string.
+ * 
+ * @package HeroQR\Customs
  */
 
 class ImageOverlay
@@ -20,12 +22,8 @@ class ImageOverlay
      */
     public function __construct($background, $overlay, $options)
     {
-        if (!MarkerPaths::isValidKey($background) || !CursorPaths::isValidKey($overlay)) {
-            throw new \InvalidArgumentException("Invalid Custom Marker Or Custom Cursor");
-        }
-
-        $this->overlayPath = constant("HeroQR\\Customs\\CursorPaths::{$overlay}");
-        $this->backgroundPath = constant("HeroQR\\Customs\\MarkerPaths::{$background}");
+        $this->overlayPath = CursorPaths::getValueByKey($overlay);
+        $this->backgroundPath = MarkerPaths::getValueByKey($background);
     }
 
     /**
