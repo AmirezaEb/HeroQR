@@ -1,5 +1,15 @@
 # HeroQR - A Powerful PHP QR Code Library
 
+**Example QR Code Outputs with Different Combinations :** Below are some examples of QR codes generated using various combinations of shapes, markers, and cursors:
+
+| Preview                                                                                                              | Details |
+|----------------------------------------------------------------------------------------------------------------------|---------|
+| <img src="https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S1-M1-C1.png" width="150"> | **S1-M1-C1**  <br> **Shape:** Default (Square) <br> **Marker:** Default (Square) <br> **Cursor:** Default (Square) |
+| <img src="https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S2-M2-C2.png" width="150"> | **S2-M2-C2**  <br> **Shape:** Circle <br> **Marker:** Custom Marker 1 <br> **Cursor:** Custom Cursor 1 |
+| <img src="https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S3-M3-C3.png" width="150"> | **S3-M3-C3**  <br> **Shape:** Star <br> **Marker:** Custom Marker 2 <br> **Cursor:** Custom Cursor 2 |
+| <img src="https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M4-C4.png" width="150"> | **S4-M4-C4**  <br> **Shape:** Diamond <br> **Marker:** Custom Marker 3 <br> **Cursor:** Custom Cursor 3 |
+
+
 **Last Updated**: February 2025   
 **Author**: Amirreza Ebrahimi   
 **Contributors**: None yet   
@@ -181,14 +191,7 @@ $qrCode = $qrCodeManager
 $qrCode->saveTo('custom-qr');
 ```
 
-**Example QR Code Outputs with Different Combinations :** Below are some examples of QR codes generated using various combinations of shapes, markers, and cursors:
 
-| Combination  | Shape            | Marker           | Cursor           | Preview                                                                                    |
-| ------------ | ---------------- | ---------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| **S1-M1-C1** | Default (Square) | Default (Square) | Default (Square) | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S1-M1-C1.png) |
-| **S2-M2-C2** | Circle           | Custom Marker 1         | Custom Cursor 1         | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S2-M2-C2.png) |
-| **S3-M3-C3** | Star             | Custom Marker 2         | Custom Cursor 2         | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S3-M3-C3.png) |
-| **S4-M4-C4** | Diamond          | Custom Marker 3         | Custom Cursor 3         | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M4-C4.png) |
 
 - **Experiment with Different Combinations:** In this section, you can experiment with various combinations of shapes, markers, and cursors to create unique QR codes that best suit your needs. Each combination will impact the appearance of the QR code, from the corners and points to the positioning of the markers. Simply adjust the parameters to customize your QR codes.
 
