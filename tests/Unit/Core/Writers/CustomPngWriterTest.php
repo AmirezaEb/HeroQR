@@ -2,7 +2,6 @@
 
 namespace HeroQR\Tests\Unit\Core\Writers;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use HeroQR\Core\QRCodeGenerator;
 use Endroid\QrCode\Matrix\Matrix;
@@ -49,7 +48,7 @@ class CustomPngWriterTest extends TestCase
     {
         for ($i = 0; $i <= 2; $i++) {
 
-            $this->expectException(InvalidArgumentException::class);
+            $this->expectException(\InvalidArgumentException::class);
             $this->expectExceptionMessageMatches('/Invalid key \'.+\' provided. Valid keys are : .+/');
 
             $this->qrCodeGenerator->setSize(100)
@@ -67,8 +66,8 @@ class CustomPngWriterTest extends TestCase
     #[Test]
     public function isInvalidFormat(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Customization is not supported for the "svg" format. Please use "png" for customizations.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Custom writers not supported for 'svg'");
 
         $this->qrCodeGenerator->setSize(100)
             ->generate('svg', [

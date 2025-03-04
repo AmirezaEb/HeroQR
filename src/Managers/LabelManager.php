@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HeroQR\Managers;
 
-use InvalidArgumentException;
 use Endroid\QrCode\Label\Font\OpenSans;
 use Endroid\QrCode\Label\Margin\Margin;
 use Endroid\QrCode\Color\ColorInterface;
@@ -17,7 +18,6 @@ use HeroQR\Contracts\Managers\LabelManagerInterface;
  *
  * @package HeroQR\Managers
  */
-
 class LabelManager implements LabelManagerInterface
 {
     private string $label = '';
@@ -41,16 +41,17 @@ class LabelManager implements LabelManagerInterface
      * Set the label text
      * 
      * @param string $label The text to display on the label
-     * @throws InvalidArgumentException If the label text is empty or too long
+     * @throws \InvalidArgumentException If the label text is empty or too long
      */
     public function setLabel(string $label): void
     {
-        if (empty($label)) {
-            throw new InvalidArgumentException('Label Text Cannot Be Empty');
+        $labelLength = strlen($label);
+        if ($labelLength === 0) {
+            throw new \InvalidArgumentException('Label Text Cannot Be Empty');
         }
 
-        if (strlen($label) > 200) {
-            throw new InvalidArgumentException('Label Text Cannot Exceed 200 Characters');
+        if ($labelLength > 200) {
+            throw new \InvalidArgumentException('Label Text Cannot Exceed 200 Characters');
         }
 
         $this->label = htmlspecialchars($label);
@@ -80,12 +81,12 @@ class LabelManager implements LabelManagerInterface
      * Set the font size for the label
      * 
      * @param int $size The font size to apply
-     * @throws InvalidArgumentException If the size is not a positive integer
+     * @throws \InvalidArgumentException If the size is not a positive integer
      */
     public function setLabelSize(int $size): void
     {
         if ($size <= 0) {
-            throw new InvalidArgumentException('Font Size Must Be A Positive Integer');
+            throw new \InvalidArgumentException('Font Size Must Be A Positive Integer');
         }
 
         $this->labelFont = new OpenSans($size);
@@ -95,13 +96,13 @@ class LabelManager implements LabelManagerInterface
      * Set the alignment for the label
      * 
      * @param string $labelAlign The alignment (left, center, or right)
-     * @throws InvalidArgumentException If an invalid alignment is provided
+     * @throws \InvalidArgumentException If an invalid alignment is provided
      */
     public function setLabelAlign(string $labelAlign): void
     {
         $labelAlign = strtolower($labelAlign);
         if (!in_array($labelAlign, ['left', 'center', 'right'], true)) {
-            throw new InvalidArgumentException('Invalid Label Alignment. Allowed Values Are "left", "center", or "right"');
+            throw new \InvalidArgumentException('Invalid Label Alignment. Allowed Values Are "left", "center", or "right"');
         }
 
         $this->labelAlign = LabelAlignment::from($labelAlign);
@@ -121,14 +122,10 @@ class LabelManager implements LabelManagerInterface
      * Set the label color
      * 
      * @param string $color The color in hex format ('#000000FF', '#FF5733')
-     * @throws InvalidArgumentException If the color format is invalid
+     * @throws \InvalidArgumentException If the color format is invalid
      */
     public function setLabelColor(string $hexColor): void
     {
-        if (!$this->isValidHexColor($hexColor)) {
-            throw new InvalidArgumentException('Invalid Label Color Format');
-        }
-
         $this->labelColor->setLabelColor($hexColor);
     }
 
@@ -146,27 +143,26 @@ class LabelManager implements LabelManagerInterface
      * Set the label margin
      * 
      * @param array $margin An array of margin values [top, right, bottom, left]
-     * @throws InvalidArgumentException If the margin array does not contain exactly 4 values
+     * @throws \InvalidArgumentException If the margin array does not contain exactly 4 values
      */
     public function setLabelMargin(array $margin): void
     {
         if (count($margin) !== 4) {
-            throw new InvalidArgumentException('Margin Array Must Contain Exactly 4 Values [top, right, bottom, left]');
+            throw new \InvalidArgumentException('Margin Array Must Contain Exactly 4 Values [top, right, bottom, left]');
         }
 
         foreach ($margin as $key => $value) {
             if (!is_numeric($value)) {
-                throw new InvalidArgumentException("Margin Value At Index {$key} Must Be Numeric Value");
+                throw new \InvalidArgumentException("Margin Value At Index {$key} Must Be Numeric Value");
             }
 
             if ($value < -250 || $value > 250) {
-                throw new InvalidArgumentException("Margin Value At Index {$key} Must Be Between -250 And 250");
+                throw new \InvalidArgumentException("Margin Value At Index {$key} Must Be Between -250 And 250");
             }
         }
 
         $this->labelMargin = new Margin($margin[0], $margin[1], $margin[2], $margin[3]);
     }
-
 
     /**
      * Get the current label margin
@@ -176,16 +172,5 @@ class LabelManager implements LabelManagerInterface
     public function getLabelMargin(): MarginInterface
     {
         return $this->labelMargin;
-    }
-
-    /**
-     * Helper method to validate if a hex color is valid
-     *
-     * @param string $hexColor The color code to validate
-     * @return bool True if the color code is valid, false otherwise
-     */
-    private function isValidHexColor(string $hexColor): bool
-    {
-        return preg_match('/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/', $hexColor) === 1;
     }
 }

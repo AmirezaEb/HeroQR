@@ -1,106 +1,165 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HeroQR\Managers;
 
-use InvalidArgumentException;
 use Endroid\QrCode\Writer\WriterInterface;
 use HeroQR\Contracts\Managers\AbstractWriterManager;
 
 /**
- * Responsible for managing the creation and retrieval of QR code writers
- * Supports both standard and custom writers for various QR code formats,
- * enabling flexibility and customization
+ * Manages and creates QR code writer instances
+ * 
+ * This class handles the creation and validation of both standard and custom QR code writers.
+ * It ensures proper initialization of writers based on the requested format and custom parameters.
  * 
  * @package HeroQR\Managers
  */
-
 class WriterManager extends AbstractWriterManager
 {
     /**
-     * Retrieves a writer instance based on the provided format and custom values
-     *
-     * @param string $format  The format of the writer ("svg", "png", "pdf")
-     * @param array $customs  Optional custom parameters
-     * @return WriterInterface
+     * Maps standard format names to their respective writer classes
+     */
+    protected const STANDARD_WRITERS = [
+        'png' => 'Endroid\\QrCode\\Writer\\PngWriter',
+        'svg' => 'Endroid\\QrCode\\Writer\\SvgWriter',
+        'eps' => 'Endroid\\QrCode\\Writer\\EpsWriter',
+        'pdf' => 'Endroid\\QrCode\\Writer\\PdfWriter',
+        'binary' => 'Endroid\\QrCode\\Writer\\BinaryWriter',
+        'webp' => 'Endroid\\QrCode\\Writer\\WebpWriter',
+        'gif' => 'Endroid\\QrCode\\Writer\\GifWriter'
+    ];
+
+    /**
+     * Maps formats to their custom writer implementations
+     */
+    protected const CUSTOM_WRITERS = [
+        'png' => 'HeroQR\Core\Writers\CustomPngWriter'
+    ];
+
+    /**
+     * Defines valid prefixes for custom parameters
+     */
+    protected const CUSTOM_PREFIXES = [
+        'Marker' => 'M',
+        'Cursor' => 'C',
+        'Shape' => 'S'
+    ];
+
+    /**
+     * Returns an appropriate writer instance based on format and customizations
+     * 
+     * @param string $format The output format (e.g., 'png', 'svg')
+     * @param array $customs Custom styling parameters
+     * @return WriterInterface The configured writer instance
+     * @throws \InvalidArgumentException If format is unsupported
      */
     public function getWriter(string $format, array $customs = []): WriterInterface
     {
-        if ($this->hasCustomParameters($customs)) {
-            if ($format !== 'png') {
-                throw new InvalidArgumentException(sprintf(
-                    'Customization is not supported for the "%s" format. Please use "png" for customizations.',
-                    $format
-                ));
-            }
-            return $this->getCustomWriter($format, $customs);
+        $format = strtolower(trim($format));
+
+        if (!isset(self::STANDARD_WRITERS[$format])) {
+            throw new \InvalidArgumentException(
+                "Unsupported format '{$format}'. Supported formats: " .
+                    implode(', ', array_keys(self::STANDARD_WRITERS))
+            );
         }
 
-        if ($format === 'pdf') {
-            $this->ensureLibraryInstalled('FPDF', 'setasign/fpdf', 'https://github.com/Setasign/FPDF');
-        }
-
-        return $this->getStandardWriter($format);
+        return match (true) {
+            $this->hasCustomParameters($customs) => $this->createCustomWriter($format, $customs),
+            default => $this->createStandardWriter($format)
+        };
     }
 
     /**
-     * Retrieves the custom writer instance based on the provided format and custom values
-     *
-     * @param string $format  The format string ("png")
-     * @param array $customs  An array of custom parameters with keys like 'marker', 'cursor', and 'shape'
-     * @return WriterInterface
-     * @throws InvalidArgumentException
+     * Implementation of abstract method for custom writer creation
      */
     protected function getCustomWriter(string $format, array $customs): WriterInterface
     {
-        $customWriterClass = 'HeroQR\Core\Writers\Custom' . ucfirst($format) . 'Writer';
-        if (!class_exists($customWriterClass)) {
-            throw new InvalidArgumentException(sprintf(
-                'Custom Writer for format "%s" does not exist. Ensure the writer class "%s" is implemented.',
-                $format,
-                $customWriterClass
-            ));
-        }
-
-        $marker = $customs['Marker'] ?? 'M1';
-        $cursor = $customs['Cursor'] ?? 'C1';
-        $shape  = $customs['Shape'] ?? 'S1';
-
-        return new $customWriterClass($marker, $cursor, $shape);
+        return $this->createCustomWriter($format, $customs);
     }
 
     /**
-     * Retrieves the standard writer instance based on the provided format
-     *
-     * @param string $format  The standard format string ("webp", "png", "svg" ,and more...)
-     * @return WriterInterface
-     * @throws InvalidArgumentException
+     * Implementation of abstract method for standard writer creation
      */
     protected function getStandardWriter(string $format): WriterInterface
     {
-        $writerClass = 'Endroid\QrCode\Writer\\' . ucfirst($format) . 'Writer';
-        if (!class_exists($writerClass)) {
-            throw new InvalidArgumentException(sprintf(
-                'Format "%s" is not supported. Supported formats are: png, svg, pdf, webp, gif, binary, eps.',
-                $format
-            ));
-        }
-
-        $writer = new $writerClass();
-        if (!$writer instanceof WriterInterface) {
-            throw new InvalidArgumentException(sprintf('Format "%s" Is Not Supported', $format));
-        }
-
-        return $writer;
+        return $this->createStandardWriter($format);
     }
 
     /**
-     * Checks if custom parameters are provided
-     *
-     * @param array $customs  The array of custom parameters
-     * @return bool
+     * Creates a custom writer instance with specified parameters
+     * 
+     * @param string $format The desired output format
+     * @param array $customs Customization parameters
+     * @return WriterInterface
+     * @throws \InvalidArgumentException If custom writer is not supported for format
+     * @throws \RuntimeException If writer class cannot be instantiated
+     */
+    protected function createCustomWriter(string $format, array $customs): WriterInterface
+    {
+        if (!isset(self::CUSTOM_WRITERS[$format])) {
+            throw new \InvalidArgumentException("Custom writers not supported for '{$format}'");
+        }
+
+        $writerClass = self::CUSTOM_WRITERS[$format];
+
+        if (!class_exists($writerClass)) {
+            throw new \RuntimeException("Writer class '{$writerClass}' not found");
+        }
+
+        $parameters = array_map(
+            fn(string $key, string $prefix) => $this->validatePattern($customs[$key] ?? "{$prefix}1", $prefix),
+            array_keys(self::CUSTOM_PREFIXES),
+            self::CUSTOM_PREFIXES
+        );
+
+        return new $writerClass(...$parameters);
+    }
+
+    /**
+     * Creates a standard writer instance
+     * 
+     * @param string $format The desired output format
+     * @return WriterInterface
+     * @throws \RuntimeException If writer class cannot be instantiated
+     */
+    protected function createStandardWriter(string $format): WriterInterface
+    {
+        $writerClass = self::STANDARD_WRITERS[$format];
+
+        if (!class_exists($writerClass)) {
+            throw new \RuntimeException("Writer class '{$writerClass}' not found");
+        }
+
+        return new $writerClass();
+    }
+
+    /**
+     * Checks if the customs array contains any valid custom parameters
+     * 
+     * @param array $customs The customs array to check
+     * @return bool True if valid custom parameters exist
      */
     protected function hasCustomParameters(array $customs): bool
     {
-        return !empty($customs['Marker']) || !empty($customs['Cursor']) || !empty($customs['Shape']);
+        return (bool) array_intersect_key($customs, self::CUSTOM_PREFIXES);
+    }
+
+    /**
+     * Validates and normalizes a custom pattern string
+     * 
+     * @param string $value The pattern value to validate
+     * @param string $prefix The expected prefix (M, C, or S)
+     * @return string The validated and normalized pattern
+     * @throws \InvalidArgumentException If pattern is invalid
+     */
+    protected function validatePattern(string $value, string $prefix): string
+    {
+        $value = strtoupper(trim($value));
+        if (!preg_match("/^{$prefix}\d{1,2}$/", $value)) {
+            throw new \InvalidArgumentException("Invalid pattern '{$value}' for prefix '{$prefix}'");
+        }
+        return $value;
     }
 }

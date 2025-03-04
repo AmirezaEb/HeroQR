@@ -2,7 +2,6 @@
 
 namespace HeroQR\Tests\Unit\Managers;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use HeroQR\Managers\LabelManager;
 use HeroQR\Managers\ColorManager;
@@ -39,7 +38,7 @@ class LabelManagerTest extends TestCase
         $label->setLabel('test label');
         $this->assertEquals('test label', $label->getLabel(), 'Label Text Does Not Match Expected Value');
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Label Text Cannot Be Empty');
         $label->setLabel('');
     }
@@ -53,7 +52,7 @@ class LabelManagerTest extends TestCase
         $label = $this->labelManager;
         $longText = str_repeat('a', 201);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Label Text Cannot Exceed 200 Characters');
         $label->setLabel($longText);
     }
@@ -86,7 +85,7 @@ class LabelManagerTest extends TestCase
         $label->setLabelSize(15);
         $this->assertEquals(15, $label->getLabelFont()->getSize(), 'Font size Should Be Updated To 15');
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Font Size Must Be A Positive Integer');
         $label->setLabelSize(-10);
     }
@@ -107,7 +106,7 @@ class LabelManagerTest extends TestCase
             $this->assertEquals(strtolower($alignment), $label->getLabelAlign()->value, "Alignment Should Be Set To {$alignment}");
         }
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid Label Alignment. Allowed Values Are "left", "center", or "right"');
         $label->setLabelAlign('invalid');
     }
@@ -136,12 +135,12 @@ class LabelManagerTest extends TestCase
     {
         $label = $this->labelManager;
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid Label Color Format');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid hex label color format: #fffffff');
         $label->setLabelColor('#fffffff');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid Label Color Format');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid hex label color format: ffffff');
         $label->setLabelColor('ffffff');
     }
 
@@ -169,15 +168,15 @@ class LabelManagerTest extends TestCase
     {
         $label = $this->labelManager;
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Margin Array Must Contain Exactly 4 Values [top, right, bottom, left]');
         $label->setLabelMargin([10, 0]);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Margin values must be between -200 and 200');
         $label->setLabelMargin([-302, 0, 210, 0]);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('All Margin Values Must Be Numeric');
         $label->setLabelMargin(['one', '0', '5.2', '5']);
     }

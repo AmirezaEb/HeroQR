@@ -4,22 +4,15 @@ declare(strict_types=1);
 
 namespace HeroQR\Contracts\Customs;
 
-use HeroQR\Customs\ShapePaths;
-use HeroQR\Customs\ImageOverlay;
-use HeroQR\Customs\ShapeDrawers;
-use Endroid\QrCode\QrCodeInterface;
-use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Logo\LogoInterface;
-use Endroid\QrCode\Label\LabelInterface;
-use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\Color\ColorInterface;
-use Endroid\QrCode\Writer\WriterInterface;
-use Endroid\QrCode\Writer\Result\GdResult;
 use Endroid\QrCode\Matrix\MatrixInterface;
-use Endroid\QrCode\Writer\AbstractGdWriter;
-use Endroid\QrCode\ImageData\LogoImageData;
-use Endroid\QrCode\ImageData\LabelImageData;
-use Endroid\QrCode\Writer\Result\ResultInterface;
+use Endroid\QrCode\{QrCodeInterface, RoundBlockSizeMode};
+use Endroid\QrCode\Label\{LabelAlignment, LabelInterface};
+use HeroQR\Customs\{ShapeDrawers, ImageOverlay, ShapePaths};
+use Endroid\QrCode\Writer\Result\{GdResult, ResultInterface};
+use Endroid\QrCode\ImageData\{LabelImageData, LogoImageData};
+use Endroid\QrCode\Writer\{WriterInterface, AbstractGdWriter};
 
 /**
  * Abstract class for GD-based QR code writers, extending AbstractWriter and implementing WriterInterface.
@@ -237,14 +230,14 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
             [$logoWidth, $logoHeight] = $this->calculateLogoDimensions($logo, $baseBlockSize);
 
             $padding = match (true) {
-                $length >= 380 => 6,
-                $length >= 260 => 5,
-                $length >= 150 => 4,
-                $length >= 80 => 3,
-                $length >= 20 => 2,
+                $length >= 380 => 7,
+                $length >= 260 => 6,
+                $length >= 150 => 5,
+                $length >= 80 => 4,
+                $length >= 25 => 3,
+                $length >= 10 => 2,
                 default => 1,
             };
-            ($data);
         }
 
         $logoStartRow = intval(max(0, ($blockCount - $logoHeight) / 2 - $padding));
@@ -384,7 +377,7 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
             $this->copyResampledImage(
                 $baseImage,
                 $rotatedCorner,
-                ['X' => intval($columnIndex * $baseBlockSize), 'Y' => intval($rowIndex * $baseBlockSize), 'Width' => self::FINDER_PATTERN_SIZE * $baseBlockSize, 'Height' => self::FINDER_PATTERN_SIZE * $baseBlockSize,],
+                ['X' => intval($columnIndex * $baseBlockSize), 'Y' => intval($rowIndex * $baseBlockSize), 'Width' => self::FINDER_PATTERN_SIZE * $baseBlockSize, 'Height' => self::FINDER_PATTERN_SIZE * $baseBlockSize],
                 ['X' => 0, 'Y' => 0, 'Width' => self::FINDER_PATTERN_SIZE * $baseBlockSize, 'Height' => self::FINDER_PATTERN_SIZE * $baseBlockSize,]
             );
         } 

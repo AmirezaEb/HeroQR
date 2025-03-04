@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HeroQR\Managers;
 
 use Endroid\QrCode\Color\Color;
@@ -37,9 +39,14 @@ class ColorManager implements ColorManagerInterface
      * Converts the provided hex color string to an RGB value and assigns it to the QR code's color property
      *
      * @param string $hexColor The hex color string ( #ff0000,'#ffffffFF')
+     * @throws \InvalidArgumentException If the hex color format is invalid
      */
     public function setColor(string $hexColor): void
     {
+        if (!$this->isValidHexColor($hexColor)) {
+            throw new \InvalidArgumentException("Invalid hex foreground color format: {$hexColor}");
+        }
+
         $this->color = $this->hex2rgb($hexColor);
     }
 
@@ -59,9 +66,14 @@ class ColorManager implements ColorManagerInterface
      * Converts the provided hex color string to an RGB value and assigns it to the QR code's background color property
      *
      * @param string $hexColor The hex color string ( #ffffff,#ffffffFF)
+     * @throws \InvalidArgumentException If the hex color format is invalid
      */
     public function setBackgroundColor(string $hexColor): void
     {
+        if (!$this->isValidHexColor($hexColor)) {
+            throw new \InvalidArgumentException("Invalid hex background color format: {$hexColor}");
+        }
+
         $this->backgroundColor = $this->hex2rgb($hexColor);
     }
 
@@ -81,9 +93,14 @@ class ColorManager implements ColorManagerInterface
      * Converts the provided hex color string to an RGB value and assigns it to the QR code's label color property
      *
      * @param string $hexColor The hex color string ( #000000)
+     * @throws \InvalidArgumentException If the hex color format is invalid
      */
     public function setLabelColor(string $hexColor): void
     {
+        if (!$this->isValidHexColor($hexColor)) {
+            throw new \InvalidArgumentException("Invalid hex label color format: {$hexColor}");
+        }
+
         $this->labelColor = $this->hex2rgb($hexColor);
     }
 
@@ -98,12 +115,21 @@ class ColorManager implements ColorManagerInterface
     }
 
     /**
+     * Helper method to validate if a hex color is valid
+     *
+     * @param string $hexColor The color code to validate
+     * @return bool True if the color code is valid, false otherwise
+     */
+    private function isValidHexColor(string $hexColor): bool
+    {
+        return preg_match('/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/', $hexColor) === 1;
+    }
+
+    /**
      * Convert a hex color string to RGB format
-     * 
      * If the hex color includes an alpha component, it converts it to an appropriate value between 0 and 127 for use with GD functions
      * 
      * @param string $hexColor The hex color string, optionally with an alpha channel (#000000, #ff0000ff)
-     * 
      * @return ColorInterface The corresponding Color object with RGB and alpha values
      */
     private function hex2rgb(string $hexColor): ColorInterface
@@ -118,15 +144,13 @@ class ColorManager implements ColorManagerInterface
             $a = hexdec(substr($hexColor, 6, 2));
 
             return new Color($r, $g, $b, (int)($a / 2));
-        }
-
-        elseif (strlen($hexColor) === 6) {
+        } elseif (strlen($hexColor) === 6) {
 
             $r = hexdec(substr($hexColor, 0, 2));
             $g = hexdec(substr($hexColor, 2, 2));
             $b = hexdec(substr($hexColor, 4, 2));
 
-            return new Color($r, $g, $b); 
+            return new Color($r, $g, $b);
         }
 
         return new Color(0, 0, 0);

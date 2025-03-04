@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HeroQR\Managers;
 
-use InvalidArgumentException;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Encoding\EncodingInterface;
 use HeroQR\Contracts\Managers\EncodingManagerInterface;
@@ -41,12 +42,12 @@ class EncodingManager implements EncodingManagerInterface
      * Set a new encoding
      * 
      * @param string $encoding The desired encoding ('UTF-16' ,'UTF-8', 'ASCII', 'ISO-8859-1', 'ISO-8859-5', 'ISO-8859-15') and more...
-     * @throws InvalidArgumentException If the encoding is invalid or unsupported
+     * @throws \InvalidArgumentException If the encoding is invalid or unsupported
      */
     public function setEncoding(string $encoding): void
     {
         if (empty($encoding)) {
-            throw new InvalidArgumentException('Encoding Cannot Be Empty');
+            throw new \InvalidArgumentException('Encoding Cannot Be Empty');
         }
 
         $this->encoding = new Encoding($encoding);

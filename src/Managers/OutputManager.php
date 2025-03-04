@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HeroQR\Managers;
 
-use InvalidArgumentException;
 use Endroid\QrCode\Matrix\Matrix;
 use Endroid\QrCode\Writer\Result\ResultInterface;
 use HeroQR\Contracts\Managers\OutputManagerInterface;
@@ -14,7 +15,6 @@ use HeroQR\Contracts\Managers\OutputManagerInterface;
  * 
  * @package HeroQR\Managers
  */
-
 class OutputManager implements OutputManagerInterface
 {
     /**
@@ -23,31 +23,29 @@ class OutputManager implements OutputManagerInterface
      * @param ResultInterface $builder
      * @param string $path
      * @return bool
-     * @throws InvalidArgumentException if the format is unsupported or saving fails
+     * @throws InvalidArgumentException if the format is unsupported
      */
     public function saveTo(ResultInterface $builder, string $path): bool
     {
+        $mimeMap = [
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/svg+xml' => 'svg',
+            'image/webp' => 'webp',
+            'image/eps' => 'eps',
+            'application/pdf' => 'pdf',
+            'application/postscript' => 'eps',
+            'application/octet-stream' => 'bin',
+            'text/plain' => 'bin',
+        ];
+
         $format = strtolower($builder->getMimeType());
-
-        $extension = match ($format) {
-            'image/png' => '.png',
-            'image/gif' => '.gif',
-            'image/svg+xml' => '.svg',
-            'image/webp' => '.webp',
-            'image/eps' => '.eps',
-            'application/pdf' => '.pdf',
-            'application/postscript' => '.eps',
-            'application/octet-stream' => '.bin',
-            'text/plain' => '.bin',
-            default => throw new InvalidArgumentException('Unsupported format'),
-        };
-
-        $fullPath = $path . $extension;
-        $builder->saveToFile($fullPath);
-
-        if (!file_exists($fullPath)) {
-            throw new InvalidArgumentException('Saving To File Failed');
+        if (!isset($mimeMap[$format])) {
+            throw new \InvalidArgumentException('Unsupported format');
         }
+
+        $fullPath = $path . '.' . $mimeMap[$format];
+        $builder->saveToFile($fullPath);
 
         return true;
     }
@@ -72,10 +70,11 @@ class OutputManager implements OutputManagerInterface
     public function getMatrixAsArray(ResultInterface $builder): array
     {
         $matrix = $builder->getMatrix();
-        $matrixArray = [];
+        $blockCount = $matrix->getBlockCount();
+        $matrixArray = array_fill(0, $blockCount, array_fill(0, $blockCount, 0));
 
-        for ($row = 0; $row < $matrix->getBlockCount(); $row++) {
-            for ($col = 0; $col < $matrix->getBlockCount(); $col++) {
+        for ($row = 0; $row < $blockCount; $row++) {
+            for ($col = 0; $col < $blockCount; $col++) {
                 $matrixArray[$row][$col] = $matrix->getBlockValue($row, $col);
             }
         }

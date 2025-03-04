@@ -2,9 +2,6 @@
 
 namespace HeroQR\Tests\Integration;
 
-use Error;
-use RuntimeException;
-use InvalidArgumentException;
 use HeroQR\DataTypes\DataType;
 use PHPUnit\Framework\TestCase;
 use HeroQR\Core\QRCodeGenerator;
@@ -86,8 +83,8 @@ class QRCodeExportTest extends TestCase
             $this->assertNotEmpty(file_get_contents($this->outputPath . '.pdf'));
             unlink($this->outputPath . '.pdf');
         } else {
-            $this->expectException(RuntimeException::class);
-            $this->expectExceptionMessage('The library "<a href="https://github.com/Setasign/FPDF" target="_blank" style="text-decoration: none;">setasign/fpdf</a>" is required. Please install it using "composer require setasign/fpdf".');
+            $this->expectException(\Exception::class);
+            $this->expectExceptionMessage('Unable to find FPDF: check your installation');
             $this->qrCodeGenerator->generate('pdf');
         }
     }
@@ -182,7 +179,7 @@ class QRCodeExportTest extends TestCase
     #[Test]
     public function isExportQrcodeInvalidFormat(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
         $this->qrCodeGenerator->setSize(300);
@@ -199,7 +196,7 @@ class QRCodeExportTest extends TestCase
     #[Test]
     public function isExportWithoutGenerate(): void
     {
-        $this->expectException(Error::class);
+        $this->expectException(\Error::class);
 
         $this->qrCodeGenerator->saveTo($this->outputPath);
     }

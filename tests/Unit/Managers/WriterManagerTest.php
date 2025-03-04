@@ -2,7 +2,6 @@
 
 namespace HeroQR\Tests\Unit\Managers;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use HeroQR\Managers\WriterManager;
 use Endroid\QrCode\Writer\PngWriter;
@@ -54,8 +53,8 @@ class WriterManagerTest extends TestCase
     #[Test]
     public function isGetWriterWithInvalidCustomParameters()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Customization is not supported for the "svg" format. Please use "png" for customizations.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Custom writers not supported for 'svg'");
 
         $writerManager = new WriterManager();
         $customs = ['Marker' => 'M1'];
@@ -68,8 +67,8 @@ class WriterManagerTest extends TestCase
     #[Test]
     public function isGetWriterWithInvalidFormat()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Format "txt" is not supported. Supported formats are: png, svg, pdf, webp, gif, binary, eps.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Unsupported format 'txt'. Supported formats: png, svg, eps, pdf, binary, webp, gif");
 
         $writerManager = new WriterManager();
         $writerManager->getWriter('txt');

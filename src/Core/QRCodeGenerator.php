@@ -2,22 +2,15 @@
 
 namespace HeroQR\Core;
 
-use RuntimeException;
-use InvalidArgumentException;
 use HeroQR\DataTypes\DataType;
-use HeroQR\Managers\LogoManager;
-use Endroid\QrCode\Matrix\Matrix;
-use HeroQR\Managers\LabelManager;
-use HeroQR\Managers\ColorManager;
-use HeroQR\Managers\WriterManager;
-use HeroQR\Managers\OutputManager;
-use Endroid\QrCode\Builder\Builder;
-use HeroQR\Managers\EncodingManager;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Color\ColorInterface;
 use Endroid\QrCode\Writer\WriterInterface;
 use HeroQR\Contracts\QRCodeGeneratorInterface;
 use Endroid\QrCode\Writer\Result\ResultInterface;
+use Endroid\QrCode\{Builder\Builder,Matrix\Matrix};
+use HeroQR\Managers\{ColorManager,LabelManager,WriterManager};
+use HeroQR\Managers\{OutputManager,LogoManager,EncodingManager};
 
 /**
  * Handles the generation of QR codes with customizable options.
@@ -36,7 +29,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     private LabelManager $labelManager;
 
     /**
-     * QRCodeGenerator constructor.
+     * QRCodeGenerator constructor
      * Initializes the necessary services and sets default values for QR code properties
      *
      * @param string $outputFormat The output format (default is 'getDataUri')
@@ -88,7 +81,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * @return self The current QRCodeGenerator instance for method chaining.
      * @throws InvalidArgumentException If the specified format is not supported.
      */
-
     public function generate(string $format = 'png', array $customs = []): self
     {
         $this->builder = (new Builder(
@@ -126,7 +118,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function getMatrix(): Matrix
     {
         $this->ensureBuilderExists();
-
         return $this->OutputManager->getMatrix($this->builder);
     }
 
@@ -139,7 +130,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function getMatrixAsArray(): array
     {
         $this->ensureBuilderExists();
-
         return $this->OutputManager->getMatrixAsArray($this->builder);
     }
 
@@ -152,7 +142,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function getString(): string
     {
         $this->ensureBuilderExists();
-
         return $this->OutputManager->getString($this->builder);
     }
 
@@ -165,7 +154,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function getDataUri(): string
     {
         $this->ensureBuilderExists();
-
         return $this->OutputManager->getDataUri($this->builder);
     }
 
@@ -180,7 +168,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function saveTo(string $path): bool
     {
         $this->ensureBuilderExists();
-
         return $this->OutputManager->saveTo($this->builder, $path);
     }
 
@@ -189,7 +176,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      *
      * @param string $data The data to encode
      * @return self
-     * @throws InvalidArgumentException If the data is empty
+     * @throws \InvalidArgumentException If the data is empty
      */
     public function setData(string $data, DataType $type = DataType::Text): self
     {
@@ -200,7 +187,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         }
 
         if (empty(trim($data))) {
-            throw new InvalidArgumentException('Data cannot be empty.');
+            throw new \InvalidArgumentException('Data cannot be empty.');
         }
 
         $this->data = $this->dataSanitizer($data, $type);
@@ -222,12 +209,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      *
      * @param int $size The size of the QR code
      * @return self
-     * @throws InvalidArgumentException If the size is not a positive integer
+     * @throws \InvalidArgumentException If the size is not a positive integer
      */
     public function setSize(int $size): self
     {
         if ($size <= 0) {
-            throw new InvalidArgumentException('Size must be a positive integer.');
+            throw new \InvalidArgumentException('Size must be a positive integer.');
         }
 
         $this->size = $size;
@@ -249,12 +236,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      *
      * @param int $margin The margin size
      * @return self
-     * @throws InvalidArgumentException If the margin is negative
+     * @throws \InvalidArgumentException If the margin is negative
      */
     public function setMargin(int $margin): self
     {
         if ($margin < 0) {
-            throw new InvalidArgumentException('Margin cannot be negative.');
+            throw new \InvalidArgumentException('Margin cannot be negative.');
         }
 
         $this->margin = $margin;
@@ -280,10 +267,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      */
     public function setColor(string $hexColor): self
     {
-        if (!$this->isValidHexColor($hexColor)) {
-            throw new InvalidArgumentException('Invalid color format');
-        }
-
         $this->colorManager->setColor($hexColor);
         return $this;
     }
@@ -307,10 +290,6 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      */
     public function setBackgroundColor(string $hexColor): self
     {
-        if (!$this->isValidHexColor($hexColor)) {
-            throw new InvalidArgumentException('Invalid background color format');
-        }
-
         $this->colorManager->setBackgroundColor($hexColor);
         return $this;
     }
@@ -331,12 +310,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * @param string $logoPath The path to the logo file
      * @param int $logoSize The size of the logo (default is 80)
      * @return self
-     * @throws InvalidArgumentException If the logo file does not exist
+     * @throws \InvalidArgumentException If the logo file does not exist
      */
     public function setLogo(string $logoPath, int $logoSize = 80): self
     {
         if (!file_exists($logoPath)) {
-            throw new InvalidArgumentException('Logo File Does Not Exist');
+            throw new \InvalidArgumentException('Logo File Does Not Exist');
         }
 
         $this->logoManager->setLogo($logoPath);
@@ -363,7 +342,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * @param int $fontSize The font size of the label text (default is 50)
      * @param array $margin The margin around the label in the format [top, right, bottom, left] (default is [0, 10, 10, 10])
      * @return self Returns the current instance for method chaining
-     * @throws InvalidArgumentException If the label text is empty
+     * @throws \InvalidArgumentException If the label text is empty
      */
     public function setLabel(
         string $label,
@@ -373,7 +352,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         array $margin = [0, 10, 10, 10]
     ): self {
         if (empty($label)) {
-            throw new InvalidArgumentException('Label cannot be empty');
+            throw new \InvalidArgumentException('Label cannot be empty');
         }
 
         $this->labelManager->setLabel($label);
@@ -416,19 +395,17 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * @param DataType $type The type of data being encoded (Url, Wifi, Location, Text, Email, Phone)
      * @return string Sanitized and properly formatted data string
      */
-    private function dataSanitizer(string $data, DataType $type)
+    private function dataSanitizer(string $data, DataType $type): string
     {
         $data = htmlspecialchars($data);
 
-        $extension = match ($type) {
+        return match ($type) {
             DataType::Email => "mailto:{$data}",
             DataType::Phone => "tel:{$data}",
-            DataType::Wifi => "$data",
+            DataType::Wifi => $data,
             DataType::Location => "https://www.google.com/maps?q=$data",
             default => $data,
         };
-
-        return $extension;
     }
 
     /**
@@ -438,33 +415,22 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      * @param string $format  The format of the writer ("svg", "png", "pdf",and more...)
      * @param array $customs  An optional array of custom values for M Or C Or S
      * @return WriterInterface
-     * @throws InvalidArgumentException|RuntimeException
+     * @throws \InvalidArgumentException|\RuntimeException
      */
-    private function validateWriter(string $format, array $customs = ['S1', 'M1', 'C1']): WriterInterface
+    private function validateWriter(string $format, array $customs): WriterInterface
     {
         return $this->writerManager->getWriter($format, $customs);
     }
 
     /**
-     * Helper method to validate if a hex color is valid
-     *
-     * @param string $hexColor The color code to validate
-     * @return bool True if the color code is valid, false otherwise
-     */
-    private function isValidHexColor(string $hexColor): bool
-    {
-        return preg_match('/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/', $hexColor) === 1;
-    }
-
-    /**
      * Helper method to ensure that the builder has been initialized
      *
-     * @throws RuntimeException If the builder has not been initialized
+     * @throws \RuntimeException If the builder has not been initialized
      */
     private function ensureBuilderExists(): void
     {
         if (!$this->builder) {
-            throw new RuntimeException('No QR Code has been generated. Call generate() first.');
+            throw new \RuntimeException('No QR Code has been generated. Call generate() first.');
         }
     }
 }
