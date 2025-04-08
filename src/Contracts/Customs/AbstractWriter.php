@@ -4,35 +4,30 @@ declare(strict_types=1);
 
 namespace HeroQR\Contracts\Customs;
 
-use Endroid\QrCode\Logo\LogoInterface;
-use Endroid\QrCode\Color\ColorInterface;
-use Endroid\QrCode\Matrix\MatrixInterface;
+use HeroQR\Customs\{ImageOverlay, ShapePaths};
 use Endroid\QrCode\{QrCodeInterface, RoundBlockSizeMode};
 use Endroid\QrCode\Label\{LabelAlignment, LabelInterface};
-use HeroQR\Customs\{ShapeDrawers, ImageOverlay, ShapePaths};
 use Endroid\QrCode\Writer\Result\{GdResult, ResultInterface};
 use Endroid\QrCode\ImageData\{LabelImageData, LogoImageData};
 use Endroid\QrCode\Writer\{WriterInterface, AbstractGdWriter};
+use Endroid\QrCode\{Logo\LogoInterface, Matrix\MatrixInterface};
 
 /**
- * Abstract class for GD-based QR code writers, extending AbstractWriter and implementing WriterInterface.
- * 
- * This class provides the base functionality for generating QR code images using the GD library.
- * Subclasses will implement the specific logic for rendering QR codes with the GD image processing library.
- * 
+ * The AbstractWriter class is responsible for generating QR code images using the GD library
+ * This class provides base functionality for creating QR code images with options like logo and label embedding
+ * Subclasses should implement specific logic for rendering QR codes using the GD image processing library
+ *
  * @package HeroQR\Contracts\Customs
  */
-
 readonly abstract class AbstractWriter extends AbstractGdWriter implements WriterInterface
 {
     private const QUALITY_MULTIPLIER = 10;
-    private const FINDER_PATTERN_SIZE = 7;
-    private imageOverlay $imageOverlay;
-    private string $blockShape;
+    private ImageOverlay $imageOverlay;
+    protected string $blockShape;
 
-    public function __construct($background, $overlay, $blockShape, $options = [])
+    public function __construct($background, $overlay, $blockShape)
     {
-        $this->imageOverlay = new ImageOverlay($background, $overlay, $options);
+        $this->imageOverlay = new ImageOverlay($background, $overlay);
         $this->blockShape = ShapePaths::getValueByKey($blockShape) ?? 'drawSquare';
     }
 
@@ -43,16 +38,16 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
      * @param LogoInterface|null $logo The logo to be embedded in the QR code (optional)
      * @param LabelInterface|null $label The label to be added to the QR code (optional)
      * @param array $options Additional options for the QR code generation
-     * 
+     *
      * @return ResultInterface The result containing the generated QR code image
-     * 
+     *
      * @throws \Exception If the GD extension is not loaded
      */
     public function write(
         QrCodeInterface $qrCode,
-        ?LogoInterface $logo = null,
+        ?LogoInterface  $logo = null,
         ?LabelInterface $label = null,
-        array $options = []
+        array           $options = []
     ): ResultInterface {
         if (!extension_loaded('gd')) {
             throw new \Exception('Unable to generate image: please check if the GD extension is enabled and configured correctly');
@@ -64,24 +59,18 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
         $baseImage = $this->createBaseImage($matrix, $baseBlockSize);
         $foregroundColor = $this->allocateForegroundColor($baseImage, $qrCode);
 
-        $cornerImage = $this->prepareCornerImage($qrCode);
-        $resizedCorner = $this->resizeCornerImage($cornerImage, $baseBlockSize);
-
-        $this->drawMatrix($baseImage, $matrix, $baseBlockSize, $foregroundColor, $resizedCorner, $logo, $qrCode->getData());
-
-        imagedestroy($cornerImage);
-        imagedestroy($resizedCorner);
+        Drawer::drawQrCode($baseImage, $matrix, $baseBlockSize, $foregroundColor, $qrCode, $this->blockShape, $this->imageOverlay);
 
         $targetImage = $this->createTargetImage($matrix, $qrCode, $label);
 
-        $this->copyResampledImage(
+        Drawer::copyResampledImage(
             $targetImage,
             $baseImage,
             ['X' => $matrix->getMarginLeft(), 'Y' => $matrix->getMarginRight(), 'Width' => $matrix->getInnerSize(), 'Height' => $matrix->getInnerSize()],
-            ['X' => 0, 'Y' => 0, 'Width' => imagesx($baseImage), 'Height' => imagesy($baseImage)]
+            ['X' => 0, 'Y' => 0, 'Width' => imagesy($baseImage), 'Height' => imagesy($baseImage)]
         );
 
-        imagedestroy($baseImage);
+        $this->destroyImages([$baseImage]);
 
         $result = new GdResult($matrix, $targetImage);
 
@@ -101,12 +90,12 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
      *
      * @param MatrixInterface $matrix The matrix that defines the block layout for the QR code
      * @param int $baseBlockSize The size of each block in the QR code
-     * 
+     *
      * @return \GdImage The created base image resource
      */
     private function createBaseImage(
         MatrixInterface $matrix,
-        int $baseBlockSize
+        int             $baseBlockSize
     ): \GdImage {
         $baseImage = imagecreatetruecolor($matrix->getBlockCount() * $baseBlockSize, $matrix->getBlockCount() * $baseBlockSize);
 
@@ -125,11 +114,11 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
      *
      * @param \GdImage $baseImage The base image to apply the foreground color to
      * @param QrCodeInterface $qrCode The QR code object to get the foreground color from
-     * 
+     *
      * @return int The allocated color identifier
      */
     private function allocateForegroundColor(
-        \GdImage $baseImage,
+        \GdImage        $baseImage,
         QrCodeInterface $qrCode
     ): int {
         return imagecolorallocatealpha(
@@ -142,255 +131,14 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
     }
 
     /**
-     * Prepares the corner image for the QR code
-     *
-     * @param QrCodeInterface $qrCode The QR code object
-     * 
-     * @return \GdImage The prepared corner image
-     * @throws \Exception If the corner image cannot be loaded
-     */
-    private function prepareCornerImage(
-        QrCodeInterface $qrCode
-    ): \GdImage {
-        $cornerImage = $this->imageOverlay->getImage();
-
-        if (!$cornerImage) {
-            throw new \Exception('Unable to load corner image');
-        }
-
-        imageantialias($cornerImage, true);
-        imagesavealpha($cornerImage, true);
-
-        return $this->tintImage($cornerImage, $qrCode->getForegroundColor());
-    }
-
-    /**
-     * Resizes the corner image to fit the QR code matrix
-     *
-     * @param \GdImage $cornerImage The original corner image
-     * @param int $baseBlockSize The size of the base blocks in the QR code
-     * 
-     * @return \GdImage The resized corner image
-     */
-    private function resizeCornerImage(
-        \GdImage $cornerImage,
-        int $baseBlockSize
-    ): \GdImage {
-        $cornerSize = self::FINDER_PATTERN_SIZE * $baseBlockSize;
-        $resizedCorner = imagecreatetruecolor($cornerSize, $cornerSize);
-
-        imageantialias($resizedCorner, true);
-        imagesavealpha($resizedCorner, true);
-        imagealphablending($resizedCorner, false);
-
-        $transparent = imagecolorallocatealpha($resizedCorner, 0, 0, 0, 127);
-        imagefill($resizedCorner, 0, 0, $transparent);
-
-        imagealphablending($resizedCorner, true);
-
-        $this->copyResampledImage(
-            $resizedCorner,
-            $cornerImage,
-            ['X' => 0, 'Y' => 0, 'Width' => $cornerSize, 'Height' => $cornerSize,],
-            ['X' => 0, 'Y' => 0, 'Width' => imagesy($cornerImage), 'Height' => imagesy($cornerImage)]
-        );
-
-        return $resizedCorner;
-    }
-
-    /**
-     * Draws the QR code matrix onto the base image.
-     *
-     * @param \GdImage $baseImage The base image for the QR code.
-     * @param MatrixInterface $matrix The QR code matrix.
-     * @param int $baseBlockSize The size of each block in the QR code.
-     * @param int $foregroundColor The fill color for the blocks.
-     * @param \GdImage $resizedCorner Resized corner image for rounded blocks.
-     * @param LogoInterface|null $logo The logo to embed in the QR code (optional).
-     * @param string|null $data The data encoded in the QR code (optional).
-     *
-     * @return void
-     */
-    private function drawMatrix(
-        \GdImage $baseImage,
-        MatrixInterface $matrix,
-        int $baseBlockSize,
-        int $foregroundColor,
-        \GdImage $resizedCorner,
-        ?LogoInterface $logo = null,
-        ?string $data = null
-    ): void {
-        $blockCount = $matrix->getBlockCount();
-
-        if ($logo === null) {
-            [$padding, $logoWidth, $logoHeight] = [0, 0, 0];
-        } else {
-            $length = strlen($data ?? '');
-
-            [$logoWidth, $logoHeight] = $this->calculateLogoDimensions($logo, $baseBlockSize);
-
-            $padding = match (true) {
-                $length >= 380 => 7,
-                $length >= 260 => 6,
-                $length >= 150 => 5,
-                $length >= 80 => 4,
-                $length >= 25 => 3,
-                $length >= 10 => 2,
-                default => 1,
-            };
-        }
-
-        $logoStartRow = intval(max(0, ($blockCount - $logoHeight) / 2 - $padding));
-        $logoEndRow = intval(min($blockCount, ($blockCount + $logoHeight) / 2 + $padding));
-        $logoStartCol = intval(max(0, ($blockCount - $logoWidth) / 2 - $padding));
-        $logoEndCol = intval(min($blockCount, ($blockCount + $logoWidth) / 2 + $padding));
-
-        for ($rowIndex = 0; $rowIndex < $blockCount; ++$rowIndex) {
-            for ($columnIndex = 0; $columnIndex < $blockCount; ++$columnIndex) {
-                if ($this->isWithinLogoBounds($rowIndex, $columnIndex, $logoStartRow, $logoEndRow, $logoStartCol, $logoEndCol)) {
-                    continue;
-                }
-
-                if ($matrix->getBlockValue($rowIndex, $columnIndex) === 1) {
-                    $this->drawMatrixBlock($baseImage, $matrix, $rowIndex, $columnIndex, $baseBlockSize, $foregroundColor, $resizedCorner);
-                }
-            }
-        }
-    }
-
-    /**
-     * Calculates the dimensions of the logo in terms of QR code blocks.
-     *
-     * @param LogoInterface|null $logo The logo to embed.
-     * @param int $baseBlockSize The size of each block.
-     *
-     * @return array [logoWidth, logoHeight]
-     */
-    private function calculateLogoDimensions(?LogoInterface $logo, int $baseBlockSize): array
-    {
-        if ($logo !== null) {
-            return [
-                (int)ceil($logo->getResizeToWidth() / $baseBlockSize),
-                (int)ceil($logo->getResizeToHeight() / $baseBlockSize),
-            ];
-        }
-        return [0, 0];
-    }
-
-    /**
-     * Checks if a block is within the logo bounds.
-     *
-     * @param int $rowIndex The row index of the block.
-     * @param int $columnIndex The column index of the block.
-     * @param int $logoStartRow The starting row of the logo.
-     * @param int $logoEndRow The ending row of the logo.
-     * @param int $logoStartCol The starting column of the logo.
-     * @param int $logoEndCol The ending column of the logo.
-     *
-     * @return bool True if the block is within the logo bounds, false otherwise.
-     */
-    private function isWithinLogoBounds(
-        int $rowIndex,
-        int $columnIndex,
-        int $logoStartRow,
-        int $logoEndRow,
-        int $logoStartCol,
-        int $logoEndCol
-    ): bool {
-        return (
-            $rowIndex >= $logoStartRow && $rowIndex < $logoEndRow &&
-            $columnIndex >= $logoStartCol && $columnIndex < $logoEndCol
-        );
-    }
-
-    /**
-     * Draws a block of the matrix on the QR code image, handling special corner blocks and filling others with a foreground color
-     *
-     * @param \GdImage $baseImage The base image where the block will be drawn
-     * @param MatrixInterface $matrix The matrix representing the QR code
-     * @param int $rowIndex The row index of the block
-     * @param int $columnIndex The column index of the block
-     * @param int $baseBlockSize The size of each block in the QR code
-     * @param int $foregroundColor The color to fill the block
-     * @param \GdImage $resizedCorner The resized corner image (used for corner blocks)
-     * 
-     * @return void
-     */
-    private function drawMatrixBlock(
-        \GdImage $baseImage,
-        MatrixInterface $matrix,
-        int $rowIndex,
-        int $columnIndex,
-        int $baseBlockSize,
-        int $foregroundColor,
-        \GdImage $resizedCorner
-    ): void {
-        $isTopLeft = $rowIndex < self::FINDER_PATTERN_SIZE && $columnIndex < self::FINDER_PATTERN_SIZE;
-        $isTopRight = $rowIndex < self::FINDER_PATTERN_SIZE && $columnIndex >= $matrix->getBlockCount() - self::FINDER_PATTERN_SIZE;
-        $isBottomLeft = $rowIndex >= $matrix->getBlockCount() - self::FINDER_PATTERN_SIZE && $columnIndex < self::FINDER_PATTERN_SIZE;
-
-        if ($isTopLeft || $isTopRight || $isBottomLeft) {
-            $this->drawCornerBlock($baseImage, $matrix, $rowIndex, $columnIndex, $baseBlockSize, $resizedCorner, $isTopLeft, $isTopRight, $isBottomLeft);
-        } else {
-            ShapeDrawers::{$this->blockShape}($baseImage, $rowIndex, $columnIndex, $baseBlockSize, $foregroundColor);
-        }
-    }
-
-    /**
-     * Draws a corner block on the QR code image (top-left, top-right, or bottom-left)
-     *
-     * @param \GdImage $baseImage The base image where the corner block will be drawn
-     * @param MatrixInterface $matrix The matrix representing the QR code
-     * @param int $rowIndex The row index of the block
-     * @param int $columnIndex The column index of the block
-     * @param int $baseBlockSize The size of each block in the QR code
-     * @param \GdImage $resizedCorner The resized corner image
-     * @param bool $isTopLeft Whether the corner is top-left
-     * @param bool $isTopRight Whether the corner is top-right
-     * @param bool $isBottomLeft Whether the corner is bottom-left
-     * 
-     * @return void
-     */
-    private function drawCornerBlock(
-        \GdImage $baseImage,
-        MatrixInterface $matrix,
-        int $rowIndex,
-        int $columnIndex,
-        int $baseBlockSize,
-        \GdImage $resizedCorner,
-        bool $isTopLeft,
-        bool $isTopRight,
-        bool $isBottomLeft
-    ): void {
-        if (($isTopLeft && $rowIndex === 0 && $columnIndex === 0) ||
-            ($isTopRight && $rowIndex === 0 && $columnIndex === $matrix->getBlockCount() - self::FINDER_PATTERN_SIZE) ||
-            ($isBottomLeft && $rowIndex === $matrix->getBlockCount() - self::FINDER_PATTERN_SIZE && $columnIndex === 0)
-        ) {
-            $rotatedCorner = $resizedCorner;
-
-            if ($isTopRight) {
-                $rotatedCorner = imagerotate($resizedCorner, 270, imagecolorallocatealpha($resizedCorner, 0, 0, 0, 127));
-            } elseif ($isBottomLeft) {
-                $rotatedCorner = imagerotate($resizedCorner, 90, imagecolorallocatealpha($resizedCorner, 0, 0, 0, 127));
-            }
-
-            $this->copyResampledImage(
-                $baseImage,
-                $rotatedCorner,
-                ['X' => intval($columnIndex * $baseBlockSize), 'Y' => intval($rowIndex * $baseBlockSize), 'Width' => self::FINDER_PATTERN_SIZE * $baseBlockSize, 'Height' => self::FINDER_PATTERN_SIZE * $baseBlockSize],
-                ['X' => 0, 'Y' => 0, 'Width' => self::FINDER_PATTERN_SIZE * $baseBlockSize, 'Height' => self::FINDER_PATTERN_SIZE * $baseBlockSize,]
-            );
-        } 
-    }
-
-    /**
      * Creates the target image for the QR code, including label if provided
      *
      * @param MatrixInterface $matrix The matrix representation of the QR code
      * @param QrCodeInterface $qrCode The QR code instance
      * @param LabelInterface|null $label The optional label to add below the QR code
-     * 
+     *
      * @return resource|\GdImage The created target image.
+     * @throws \Exception
      */
     private function createTargetImage(
         MatrixInterface $matrix,
@@ -425,89 +173,18 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
     }
 
     /**
-     * Resamples and copies a portion of the source image to the destination image
-     *
-     * @param \GdImage $dstImage Destination image resource
-     * @param \GdImage $srcImage Source image resource
-     * @param array $dst_X_Y_W_H Destination coordinates and dimensions (X, Y, Width, Height)
-     * @param array $src_X_Y_W_H Source coordinates and dimensions (X, Y, Width, Height)
-     * 
-     * @return bool True on success, false on failure
-     */
-    private function copyResampledImage(
-        \GdImage $dstImage,
-        \GdImage $srcImage,
-        array $dst_X_Y_W_H,
-        array $src_X_Y_W_H
-    ): bool {
-        return imagecopyresampled(
-            $dstImage,
-            $srcImage,
-            $dst_X_Y_W_H['X'],
-            $dst_X_Y_W_H['Y'],
-            $src_X_Y_W_H['X'],
-            $src_X_Y_W_H['Y'],
-            $dst_X_Y_W_H['Width'],
-            $dst_X_Y_W_H['Height'],
-            $src_X_Y_W_H['Width'],
-            $src_X_Y_W_H['Height'],
-        );
-    }
-
-    /**
-     * Tints the image with a specified color, applying the color to non-transparent pixels
-     * 
-     * @param \GdImage $image The image to tint
-     * @param ColorInterface $color The color to apply to the image
-     * 
-     * @return \GdImage The tinted image
-     */
-    private function tintImage(
-        \GdImage $image,
-        ColorInterface $color
-    ): \GdImage {
-        [$width, $height] = [imagesx($image), imagesy($image)];
-
-        $tinted = imagecreatetruecolor($width, $height);
-
-        imagesavealpha($tinted, true);
-        imagealphablending($tinted, false);
-
-        $transparent = imagecolorallocatealpha($tinted, 0, 0, 0, 127);
-        imagefill($tinted, 0, 0, $transparent);
-
-        for ($x = 0; $x < $width; $x++) {
-            for ($y = 0; $y < $height; $y++) {
-                $pixelColor = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-
-                if ($pixelColor['alpha'] < 120) {
-                    $newColor = imagecolorallocatealpha(
-                        $tinted,
-                        $color->getRed(),
-                        $color->getGreen(),
-                        $color->getBlue(),
-                        $color->getAlpha()
-                    );
-
-                    imagesetpixel($tinted, $x, $y, $newColor);
-                }
-            }
-        }
-        return $tinted;
-    }
-
-    /**
-     * Adds a logo to the image, centered and with optional punchout background
+     * Adds a logo to the image, centered and with optional punch out background
      * Throws an exception if the logo is not in PNG format
-     * 
+     *
      * @param LogoInterface $logo The logo to add
      * @param GdResult $result The image to add the logo to
-     * 
+     *
      * @return GdResult The updated image with the logo
+     * @throws \Exception
      */
     private function addLogoToResult(
         LogoInterface $logo,
-        GdResult $result
+        GdResult      $result
     ): GdResult {
         $logoImageData = LogoImageData::createForLogo($logo);
 
@@ -530,7 +207,7 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
             }
         }
 
-        $this->copyResampledImage(
+        Drawer::copyResampledImage(
             $targetImage,
             $logoImageData->getImage(),
             ['X' => intval($matrix->getOuterSize() / 2 - $logoImageData->getWidth() / 2), 'Y' => intval($matrix->getOuterSize() / 2 - $logoImageData->getWidth() / 2), 'Width' => $logoImageData->getWidth(), 'Height' => $logoImageData->getHeight()],
@@ -540,21 +217,21 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
         return new GdResult($matrix, $targetImage);
     }
 
-
     /**
      * Adds a label with text to the image
      *
      * The label's position is based on its alignment (left, center, right) and margin
      * The text is drawn using the specified font and color
-     * 
+     *
      * @param LabelInterface $label The label to add
      * @param GdResult $result The image to add the label to
-     * 
+     *
      * @return GdResult The updated image
+     * @throws \Exception
      */
     private function addLabelToResult(
         LabelInterface $label,
-        GdResult $result
+        GdResult       $result
     ): GdResult {
         $targetImage = $result->getImage();
         $labelImageData = LabelImageData::createForLabel($label);
@@ -579,5 +256,18 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
         imagettftext($targetImage, $label->getFont()->getSize(), 0, $x, $y, $textColor, $label->getFont()->getPath(), $label->getText());
 
         return new GdResult($result->getMatrix(), $targetImage);
+    }
+
+    /**
+     * Frees up memory by destroying image resources.
+     *
+     * @param array $images An array of image resources.
+     * @return void
+     */
+    private function destroyImages(array $images): void
+    {
+        foreach ($images as $image) {
+            imagedestroy($image);
+        }
     }
 }

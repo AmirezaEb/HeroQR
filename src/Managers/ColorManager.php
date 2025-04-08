@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace HeroQR\Managers;
 
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Color\ColorInterface;
+use Endroid\QrCode\Color\{Color,ColorInterface};
 use HeroQR\Contracts\Managers\ColorManagerInterface;
 
 /**

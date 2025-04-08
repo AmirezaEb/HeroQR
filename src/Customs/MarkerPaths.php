@@ -5,12 +5,11 @@ namespace HeroQR\Customs;
 use HeroQR\Contracts\Customs\AbstractCustomPaths;
 
 /**
- * A class that manages paths for marker images, providing methods to retrieve paths, 
+ * A class that manages paths for marker images, providing methods to retrieve paths,
  * validate keys, and get the specific path for a marker based on its key
- * 
+ *
  * @package HeroQR\Customs
  */
-
 class MarkerPaths extends AbstractCustomPaths
 {
     public const M1 = __DIR__ . '/../../assets/Markers/Marker-1.png';
@@ -26,13 +25,6 @@ class MarkerPaths extends AbstractCustomPaths
         $reflection = new \ReflectionClass(static::class);
         $constants = $reflection->getConstants();
 
-        $paths = [];
-        foreach ($constants as $key => $value) {
-            if (strpos($key, 'M') === 0) {
-                $paths[$key] = $value;
-            }
-        }
-
-        return $paths;
+        return array_filter($constants, fn($key) => str_starts_with($key, 'M'), ARRAY_FILTER_USE_KEY);
     }
 }

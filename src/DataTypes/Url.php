@@ -34,7 +34,7 @@ class Url extends AbstractDataType
     {
         $parsedUrl = parse_url($url);
 
-        if (!filter_var($url, FILTER_VALIDATE_URL) || !isset($parsedUrl['host']) || empty($parsedUrl['host'])) {
+        if (!filter_var($url, FILTER_VALIDATE_URL) || empty($parsedUrl['host'])) {
             return false;
         }
 

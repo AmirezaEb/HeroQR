@@ -11,7 +11,6 @@ namespace HeroQR\Customs;
  *
  * @package HeroQR\Customs
  */
-
 class ShapeDrawers
 {
     /**
@@ -19,10 +18,10 @@ class ShapeDrawers
      */
     public static function drawStar(
         \GdImage $baseImage,
-        int $rowIndex,
-        int $columnIndex,
-        int $baseBlockSize,
-        int $foregroundColor
+        int      $rowIndex,
+        int      $columnIndex,
+        int      $baseBlockSize,
+        int      $foregroundColor
     ): void {
         $points = [];
         for ($i = 0; $i < 10; $i++) {
@@ -39,10 +38,10 @@ class ShapeDrawers
      */
     public static function drawSquare(
         \GdImage $baseImage,
-        int $rowIndex,
-        int $columnIndex,
-        int $baseBlockSize,
-        int $foregroundColor
+        int      $rowIndex,
+        int      $columnIndex,
+        int      $baseBlockSize,
+        int      $foregroundColor
     ): void {
         imagefilledrectangle(
             $baseImage,
@@ -59,10 +58,10 @@ class ShapeDrawers
      */
     public static function drawCircle(
         \GdImage $baseImage,
-        int $rowIndex,
-        int $columnIndex,
-        int $baseBlockSize,
-        int $foregroundColor
+        int      $rowIndex,
+        int      $columnIndex,
+        int      $baseBlockSize,
+        int      $foregroundColor
     ): void {
         imagefilledellipse(
             $baseImage,
@@ -79,10 +78,10 @@ class ShapeDrawers
      */
     public static function drawDiamond(
         \GdImage $baseImage,
-        int $rowIndex,
-        int $columnIndex,
-        int $baseBlockSize,
-        int $foregroundColor
+        int      $rowIndex,
+        int      $columnIndex,
+        int      $baseBlockSize,
+        int      $foregroundColor
     ): void {
         $centerX = $columnIndex * $baseBlockSize + $baseBlockSize / 2;
         $centerY = $rowIndex * $baseBlockSize + $baseBlockSize / 2;

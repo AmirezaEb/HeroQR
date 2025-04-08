@@ -47,12 +47,11 @@ class WriterManager extends AbstractWriterManager
     ];
 
     /**
-     * Returns an appropriate writer instance based on format and customizations
-     * 
-     * @param string $format The output format (e.g., 'png', 'svg')
-     * @param array $customs Custom styling parameters
-     * @return WriterInterface The configured writer instance
-     * @throws \InvalidArgumentException If format is unsupported
+     * Returns a writer based on format and custom settings.
+     *
+     * @param string $format The desired output format.
+     * @param array $customs (Optional) Custom settings for the writer.
+     * @return WriterInterface A writer for the specified format and settings.
      */
     public function getWriter(string $format, array $customs = []): WriterInterface
     {
@@ -72,7 +71,11 @@ class WriterManager extends AbstractWriterManager
     }
 
     /**
-     * Implementation of abstract method for custom writer creation
+     * Returns a custom writer based on format and custom settings.
+     *
+     * @param string $format The desired output format.
+     * @param array $customs Custom settings for the writer.
+     * @return WriterInterface A custom writer for the specified format and settings.
      */
     protected function getCustomWriter(string $format, array $customs): WriterInterface
     {
@@ -80,7 +83,10 @@ class WriterManager extends AbstractWriterManager
     }
 
     /**
-     * Implementation of abstract method for standard writer creation
+     * Returns a standard writer based on the format.
+     *
+     * @param string $format The desired output format.
+     * @return WriterInterface A standard writer for the specified format.
      */
     protected function getStandardWriter(string $format): WriterInterface
     {

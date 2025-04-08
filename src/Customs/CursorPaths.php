@@ -5,12 +5,11 @@ namespace HeroQR\Customs;
 use HeroQR\Contracts\Customs\AbstractCustomPaths;
 
 /**
- * This class manages a collection of cursor paths, providing methods to retrieve paths by key 
+ * This class manages a collection of cursor paths, providing methods to retrieve paths by key
  * and validate whether a given key corresponds to a valid cursor
- * 
+ *
  * @package HeroQR\Customs
  */
-
 class CursorPaths extends AbstractCustomPaths
 {
     public const C1 = __DIR__ . '/../../assets/Cursors/Cursor-1.png';
@@ -27,13 +26,6 @@ class CursorPaths extends AbstractCustomPaths
         $reflection = new \ReflectionClass(static::class);
         $constants = $reflection->getConstants();
 
-        $paths = [];
-        foreach ($constants as $key => $value) {
-            if (strpos($key, 'C') === 0) {
-                $paths[$key] = $value;
-            }
-        }
-
-        return $paths;
+        return array_filter($constants, fn($key) => str_starts_with($key, 'C'), ARRAY_FILTER_USE_KEY);
     }
 }

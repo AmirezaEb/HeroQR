@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace HeroQR\Managers;
 
-use Endroid\QrCode\Matrix\Matrix;
-use Endroid\QrCode\Writer\Result\ResultInterface;
+use Endroid\QrCode\{Matrix\Matrix,Writer\Result\ResultInterface};
 use HeroQR\Contracts\Managers\OutputManagerInterface;
 
 /**
@@ -23,7 +22,7 @@ class OutputManager implements OutputManagerInterface
      * @param ResultInterface $builder
      * @param string $path
      * @return bool
-     * @throws InvalidArgumentException if the format is unsupported
+     * @throws \InvalidArgumentException if the format is unsupported
      */
     public function saveTo(ResultInterface $builder, string $path): bool
     {

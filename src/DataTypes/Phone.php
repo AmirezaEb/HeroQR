@@ -2,7 +2,6 @@
 
 namespace HeroQR\DataTypes;
 
-use RuntimeException;
 use libphonenumber\PhoneNumberUtil;
 use HeroQR\Contracts\DataTypes\AbstractDataType;
 
@@ -30,7 +29,7 @@ class Phone extends AbstractDataType
         $className = 'libphonenumber\PhoneNumberUtil';
 
         if (!class_exists($className)) {
-            throw new RuntimeException('The library "<a href="https://github.com/giggsey/libphonenumber-for-php" target="_blank" style="text-decoration: none;">giggsey/libphonenumber-for-php</a>" is required for phone number validation. Please install it using "composer require giggsey/libphonenumber-for-php".');
+            throw new \RuntimeException('The library "<a href="https://github.com/giggsey/libphonenumber-for-php" target="_blank" style="text-decoration: none;">giggsey/libphonenumber-for-php</a>" is required for phone number validation. Please install it using "composer require giggsey/libphonenumber-for-php".');
         }
         
         
@@ -38,6 +37,6 @@ class Phone extends AbstractDataType
 
         $phoneNumber = $phoneNumberUtil->parse($phone, null);
 
-        return $phoneNumber ? true : false;
+        return (bool)$phoneNumber;
     }
 }

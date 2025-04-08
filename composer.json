@@ -8,7 +8,7 @@
         "qrcode",
         "HeroQR",
         "laravel",
-        "qr-codes",
+        "qr-code",
         "AmirezaEb",
         "management",
         "php-library"
@@ -50,6 +50,7 @@
         }
     },
     "require-dev": {
+        "ext-gd" : "*",
         "phpunit/phpunit": "^10.5"
     }
 }

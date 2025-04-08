@@ -59,7 +59,7 @@ abstract class AbstractDataType
      */
     protected static function toString(string $value): string
     {
-        return (string)$value;
+        return $value;
     }
 
     /**
@@ -70,7 +70,7 @@ abstract class AbstractDataType
      */
     protected static function hasSqlInjection(string $value): bool
     {
-        $blacklist = ['SELECT', 'INSERT', 'DROP', 'UNION', '--', ';', '/*', '*/'];
+        $blacklist = ['SELECT', 'INSERT', 'DROP', 'UNION', '--', ';', '/*', '*/', '*'];
 
         foreach ($blacklist as $keyword) {
             if (stripos($value, $keyword) !== false) {

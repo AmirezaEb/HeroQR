@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace HeroQR\Managers;
 
-use Endroid\QrCode\Label\Font\OpenSans;
-use Endroid\QrCode\Label\Margin\Margin;
-use Endroid\QrCode\Color\ColorInterface;
-use Endroid\QrCode\Label\LabelAlignment;
-use Endroid\QrCode\Label\Font\FontInterface;
-use Endroid\QrCode\Label\Margin\MarginInterface;
+use Endroid\QrCode\Label\Font\{OpenSans,FontInterface};
+use Endroid\QrCode\Label\Margin\{Margin,MarginInterface};
+use Endroid\QrCode\{Label\LabelAlignment,Color\ColorInterface};
 use HeroQR\Contracts\Managers\LabelManagerInterface;
 
 /**
@@ -31,10 +28,10 @@ class LabelManager implements LabelManagerInterface
      * @param LabelAlignment $labelAlign The alignment for the label (default: center)
      */
     public function __construct(
-        private ColorManager $labelColor,
-        private MarginInterface $labelMargin = new Margin(0, 10, 10, 10),
-        private FontInterface $labelFont = new OpenSans(20),
-        private LabelAlignment $labelAlign = LabelAlignment::Center
+        private readonly ColorManager $labelColor,
+        private MarginInterface       $labelMargin = new Margin(0, 10, 10, 10),
+        private FontInterface         $labelFont = new OpenSans(20),
+        private LabelAlignment        $labelAlign = LabelAlignment::Center
     ) {}
 
     /**
@@ -124,9 +121,9 @@ class LabelManager implements LabelManagerInterface
      * @param string $color The color in hex format ('#000000FF', '#FF5733')
      * @throws \InvalidArgumentException If the color format is invalid
      */
-    public function setLabelColor(string $hexColor): void
+    public function setLabelColor(string $color): void
     {
-        $this->labelColor->setLabelColor($hexColor);
+        $this->labelColor->setLabelColor($color);
     }
 
     /**

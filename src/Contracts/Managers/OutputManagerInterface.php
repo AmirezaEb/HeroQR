@@ -2,19 +2,17 @@
 
 namespace HeroQR\Contracts\Managers;
 
-use Endroid\QrCode\Matrix\Matrix;
-use Endroid\QrCode\Writer\Result\ResultInterface;
+use Endroid\QrCode\{Matrix\Matrix,Writer\Result\ResultInterface};
 
 /**
  * Interface OutputManagerInterface
- * 
+ *
  * This interface defines methods for managing QR Code output operations, including
- * saving the QR code to a file, retrieving its data URI, and getting the matrix 
+ * saving the QR code to a file, retrieving its data URI, and getting the matrix
  * representation of the QR code.
- * 
+ *
  * @package HeroQR\Contracts\Managers
  */
-
 interface OutputManagerInterface
 {
     /**

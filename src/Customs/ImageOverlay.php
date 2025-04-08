@@ -2,25 +2,21 @@
 
 namespace HeroQR\Customs;
 
-use Exception;
-use GdImage;
-
 /**
- * A class that overlays a background image with a custom cursor image, providing functionality 
+ * A class that overlays a background image with a custom cursor image, providing functionality
  * to save, display, or return the result as a base64 string.
- * 
+ *
  * @package HeroQR\Customs
  */
-
 class ImageOverlay
 {
-    private $backgroundPath;
-    private $overlayPath;
+    private ?string $backgroundPath;
+    private ?string $overlayPath;
 
     /**
      * Constructor to initialize background and overlay paths
      */
-    public function __construct($background, $overlay, $options)
+    public function __construct($background, $overlay)
     {
         $this->overlayPath = CursorPaths::getValueByKey($overlay);
         $this->backgroundPath = MarkerPaths::getValueByKey($background);
@@ -32,19 +28,19 @@ class ImageOverlay
     private function validatePaths(): void
     {
         if (!file_exists($this->backgroundPath) || !file_exists($this->overlayPath)) {
-            throw new Exception('Invalid file paths for background or overlay images.');
+            throw new \Exception('Invalid file paths for background or overlay images.');
         }
     }
 
     /**
      * Creates an image resource from a file path
      */
-    private function createImageResource(string $path): GdImage
+    private function createImageResource(string $path): \GdImage
     {
         $image = imagecreatefrompng($path);
 
         if (!$image) {
-            throw new Exception('Failed to create image resource.');
+            throw new \Exception('Failed to create image resource.');
         }
 
         return $image;
@@ -53,7 +49,7 @@ class ImageOverlay
     /**
      * Creates a centered image by overlaying one image on another
      */
-    private function createCenteredImage(): GdImage
+    private function createCenteredImage(): \GdImage
     {
         $this->validatePaths();
 
@@ -132,7 +128,7 @@ class ImageOverlay
     /**
      * Returns the generated image as a GdImage instance
      */
-    public function getImage(): GdImage
+    public function getImage(): \GdImage
     {
         return $this->createCenteredImage();
     }
