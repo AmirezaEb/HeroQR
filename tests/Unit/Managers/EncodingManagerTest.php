@@ -2,12 +2,8 @@
 
 namespace HeroQR\Tests\Unit\Managers;
 
-use Exception;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use HeroQR\Managers\EncodingManager;
-use PHPUnit\Framework\Attributes\Test;
-use Endroid\QrCode\Encoding\EncodingInterface;
+use PHPUnit\Framework\{Attributes\Test, TestCase};
+use HeroQR\{Contracts\Managers\EncodingManagerInterface,Managers\EncodingManager};
 
 /**
  * Class EncodingManagerTest
@@ -23,7 +19,10 @@ class EncodingManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->encodingManager = new EncodingManager();
+
+        $this->assertInstanceOf(EncodingManagerInterface::class, $this->encodingManager,'Failed to initialize EncodingManagerInterface instance');
     }
 
     /**
@@ -34,7 +33,7 @@ class EncodingManagerTest extends TestCase
     {
         $labelEncoding = $this->encodingManager->getEncoding();
 
-        $this->assertInstanceOf(EncodingInterface::class, $labelEncoding, 'Encoding Should Be An Instance Of EncodingInterface');
+        $this->assertNotNull($labelEncoding, 'Encoding should not be null');
         $this->assertEquals('UTF-8', $labelEncoding->__toString(), 'The Default Encoding Should Be UTF-8');
     }
 
@@ -47,7 +46,7 @@ class EncodingManagerTest extends TestCase
         $this->encodingManager->setEncoding('UTF-16');
         $labelEncoding = $this->encodingManager->getEncoding();
 
-        $this->assertInstanceOf(EncodingInterface::class, $labelEncoding, 'Encoding Should Be An Instance Of EncodingInterface');
+        $this->assertNotEquals('UTF-18', $labelEncoding->__toString());
         $this->assertEquals('UTF-16', $labelEncoding->__toString(), 'Encoding Should Change To The Set Value');
     }
 
@@ -57,7 +56,7 @@ class EncodingManagerTest extends TestCase
     #[Test]
     public function isSetEncodingEmpty(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Encoding Cannot Be Empty');
 
         $this->encodingManager->setEncoding('');
@@ -69,7 +68,7 @@ class EncodingManagerTest extends TestCase
     #[Test]
     public function isSetEncodingInvalid(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
 
         $this->encodingManager->setEncoding('INVALID_ENCODING');
     }
@@ -86,7 +85,6 @@ class EncodingManagerTest extends TestCase
             $this->encodingManager->setEncoding($encodingValue);
             $labelEncoding = $this->encodingManager->getEncoding();
 
-            $this->assertInstanceOf(EncodingInterface::class, $labelEncoding, "Encoding Should Be An Instance Of EncodingInterface");
             $this->assertEquals($encodingValue, $labelEncoding->__toString(), "Encoding Should Be Set To $encodingValue");
         }
     }

@@ -2,10 +2,8 @@
 
 namespace HeroQR\Tests\Unit\Managers;
 
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use HeroQR\Managers\LogoManager;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{TestCase,Attributes\Test};
 use HeroQR\Contracts\Managers\LogoManagerInterface;
 
 /**
@@ -14,7 +12,7 @@ use HeroQR\Contracts\Managers\LogoManagerInterface;
  */
 final class LogoManagerTest extends TestCase
 {
-    private LogoManagerInterface $logoManager;
+    private LogoManager $logoManager;
 
     /**
      * Setup method
@@ -22,7 +20,10 @@ final class LogoManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->logoManager = new LogoManager();
+
+        $this->assertInstanceOf(LogoManagerInterface::class, $this->logoManager, 'The LogoManager must implement LogoManagerInterface');
     }
 
     /**
@@ -33,16 +34,16 @@ final class LogoManagerTest extends TestCase
     {
         $logoManager = $this->logoManager;
 
-
         $tempLogo = tempnam(sys_get_temp_dir(), 'logo');
         file_put_contents($tempLogo, 'fake-logo-content');
 
         $logoManager->setLogo($tempLogo);
 
-        $this->assertInstanceOf(LogoManagerInterface::class, $logoManager);
         $this->assertEquals($tempLogo, $logoManager->getLogoPath());
 
-        unlink($tempLogo);
+        if (file_exists($tempLogo)) {
+            unlink($tempLogo);
+        }
     }
 
     /**
@@ -53,8 +54,7 @@ final class LogoManagerTest extends TestCase
     {
         $logoManager = $this->logoManager;
 
-        $this->assertInstanceOf(LogoManagerInterface::class, $logoManager);
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Logo Path '/invalid/path/logo.png' Does Not Exist Or Is Not Readable");
 
         $logoManager->setLogo('/invalid/path/logo.png');
@@ -69,7 +69,6 @@ final class LogoManagerTest extends TestCase
         $logoManager = $this->logoManager;
 
         $logoManager->setLogoBackground(true);
-        $this->assertInstanceOf(LogoManagerInterface::class, $logoManager);
         $this->assertTrue($logoManager->getLogoBackground());
 
         $logoManager->setLogoBackground(false);
@@ -85,8 +84,10 @@ final class LogoManagerTest extends TestCase
         $logoManager = $this->logoManager;
 
         $logoManager->setLogoSize(100);
-        $this->assertInstanceOf(LogoManagerInterface::class, $logoManager);
-        $this->assertEquals(100, $logoManager->getLogoSize());
+        $logoSize = $logoManager->getLogoSize();
+
+        $this->assertIsInt($logoSize);
+        $this->assertEquals(100, $logoSize);
     }
 
     /**
@@ -97,8 +98,7 @@ final class LogoManagerTest extends TestCase
     {
         $logoManager = $this->logoManager;
 
-        $this->assertInstanceOf(LogoManagerInterface::class, $logoManager);
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Logo Size Must Be A Positive Integer');
 
         $logoManager->setLogoSize(-10);

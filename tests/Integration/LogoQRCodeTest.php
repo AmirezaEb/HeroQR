@@ -2,11 +2,8 @@
 
 namespace HeroQR\Tests\Integration;
 
-use InvalidArgumentException;
-use HeroQR\DataTypes\DataType;
-use PHPUnit\Framework\TestCase;
-use HeroQR\Core\QRCodeGenerator;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{Attributes\Test,TestCase};
+use HeroQR\{Core\QRCodeGenerator,DataTypes\DataType};
 
 /**
  * Class LogoQRCodeTest
@@ -25,24 +22,18 @@ class LogoQRCodeTest extends TestCase
 
     /**
      * Create a simple logo image in memory for testing
-     * @return string The path to the generated logo image
      */
     private function createLogo(): string
     {
-        $width = 100;
-        $height = 100;
-        $image = imagecreatetruecolor($width, $height);
-
+        $image = imagecreatetruecolor(100, 100);
         $bgColor = imagecolorallocate($image, 255, 255, 255);
         $circleColor = imagecolorallocate($image, 255, 87, 51);
 
         imagefill($image, 0, 0, $bgColor);
-
-        imagefilledellipse($image, $width / 2, $height / 2, $width - 20, $height - 20, $circleColor);
+        imagefilledellipse($image, 50, 50, 80, 80, $circleColor);
 
         $logoPath = './test_logo.png';
         imagepng($image, $logoPath);
-
         imagedestroy($image);
 
         return $logoPath;
@@ -52,16 +43,10 @@ class LogoQRCodeTest extends TestCase
      * Test generating QR code with logo
      */
     #[Test]
-    public function isQrcodeWithLogo(): void
+    public function itGeneratesQrcodeWithLogo(): void
     {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
         $logoPath = $this->createLogo();
-        $this->qrCodeGenerator->setLogo($logoPath);
+        $this->configureQrCodeGenerator($logoPath);
 
         $this->qrCodeGenerator->generate('png');
         $this->qrCodeGenerator->saveTo($this->outputPath);
@@ -69,27 +54,18 @@ class LogoQRCodeTest extends TestCase
         $this->assertFileExists($this->outputPath . '.png');
         $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
 
-        unlink($logoPath);
-        unlink($this->outputPath . '.png');
+        $this->cleanUp([$logoPath, $this->outputPath . '.png']);
     }
 
     /**
      * Test invalid logo path
      */
     #[Test]
-    public function isQrcodeWithInvalidLogo(): void
+    public function itFailsWithInvalidLogoPath(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $invalidLogoPath = './path/to/nonexistent/logo.png';
-        $this->qrCodeGenerator->setLogo($invalidLogoPath);
-
+        $this->configureQrCodeGenerator('./path/to/nonexistent/logo.png');
         $this->qrCodeGenerator->generate('png');
         $this->qrCodeGenerator->saveTo($this->outputPath);
     }
@@ -98,13 +74,9 @@ class LogoQRCodeTest extends TestCase
      * Test export without logo
      */
     #[Test]
-    public function isQrcodeWithoutLogo(): void
+    public function itGeneratesQrcodeWithoutLogo(): void
     {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
+        $this->configureQrCodeGenerator();
 
         $this->qrCodeGenerator->generate('png');
         $this->qrCodeGenerator->saveTo($this->outputPath);
@@ -113,5 +85,33 @@ class LogoQRCodeTest extends TestCase
         $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
 
         unlink($this->outputPath . '.png');
+    }
+
+    /**
+     * Helper method to configure QRCodeGenerator with common settings.
+     */
+    private function configureQrCodeGenerator(string $logoPath = ''): void
+    {
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(20);
+        $this->qrCodeGenerator->setColor('#FF5733');
+        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
+
+        if ($logoPath) {
+            $this->qrCodeGenerator->setLogo($logoPath);
+        }
+    }
+
+    /**
+     * Helper method to clean up generated files.
+     */
+    private function cleanUp(array $files): void
+    {
+        foreach ($files as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
     }
 }

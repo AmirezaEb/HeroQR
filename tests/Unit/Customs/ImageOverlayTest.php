@@ -2,9 +2,8 @@
 
 namespace HeroQR\Tests\Unit\Customs;
 
-use PHPUnit\Framework\TestCase;
 use HeroQR\Customs\ImageOverlay;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{Attributes\Test,TestCase};
 
 /**
  * Class ImageOverlayTest
@@ -20,8 +19,8 @@ class ImageOverlayTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->validBackgroundKey = 'M' . mt_rand(1, 3);
-        $this->validOverlayKey = 'C' . mt_rand(1, 3);
+        $this->validBackgroundKey = 'M' . mt_rand(1, 4);
+        $this->validOverlayKey = 'C' . mt_rand(1, 4);
     }
 
     /**
@@ -30,7 +29,7 @@ class ImageOverlayTest extends TestCase
     #[Test]
     public function isConstructorWithValidKeys(): void
     {
-        $imageOverlay = new ImageOverlay($this->validBackgroundKey, $this->validOverlayKey, []);
+        $imageOverlay = new ImageOverlay($this->validBackgroundKey, $this->validOverlayKey);
         $this->assertInstanceOf(ImageOverlay::class, $imageOverlay);
     }
 

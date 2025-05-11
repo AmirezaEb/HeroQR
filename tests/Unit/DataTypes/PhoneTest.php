@@ -2,69 +2,53 @@
 
 namespace HeroQR\Tests\Unit\DataTypes;
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use HeroQR\DataTypes\Phone;
-use RuntimeException;
+use PHPUnit\Framework\{Attributes\DataProvider, Attributes\Test, TestCase};
 
 /**
  * Class PhoneTest
- * Tests the Phone class.
+ * Tests the Phone class
  */
 class PhoneTest extends TestCase
 {
-    /**
-     * Test for validating valid phone numbers
+    /*
+     * Provides a list of phone numbers and expected results (true for valid, false for invalid)
      */
-    #[Test]
-    public function isValidPhone(): void
+    public static function phoneNumbersProvider(): array
     {
-        $numbers = [
-            '+98 935 891 92 79',
-            '+1 123 456 7890',
-            '+442012345678',
-            '+61212345678',
-            '+390212345678',
-            '+91 12345 67890'
+        return [
+            'Valid Iran'          => ['+98 935 891 92 79', true],
+            'Valid US'            => ['+1 123 456 7890', true],
+            'Valid UK'            => ['+442012345678', true],
+            'Valid Australia'     => ['+61212345678', true],
+            'Valid Italy'         => ['+390212345678', true],
+            'Valid India'         => ['+91 12345 67890', true],
+            'Invalid no plus'     => ['989358919279', false],
+            'Invalid unknown code'=> ['+89358919279', false],
+            'Invalid local format'=> ['90212345678', false],
+            'Invalid No Country Code' => ['555123456789', false]
         ];
-
-        $className = 'libphonenumber\PhoneNumberUtil';
-
-        if (!class_exists($className)) {
-            $this->expectException(RuntimeException::class);
-            $this->expectExceptionMessage('The library "<a href="https://github.com/giggsey/libphonenumber-for-php" target="_blank" style="text-decoration: none;">giggsey/libphonenumber-for-php</a>" is required for phone number validation. Please install it using "composer require giggsey/libphonenumber-for-php".');
-            $result = Phone::validate('+989358919279'); 
-        } else {
-            foreach ($numbers as $number) {
-                $result = Phone::validate($number);
-                $this->assertTrue($result, "Phone number $number should be valid");
-            }
-        }
     }
 
     /**
-     * Test for validating invalid phone numbers
+     * Tests phone number validation using various valid and invalid numbers
      */
     #[Test]
-    public function isInvalidPhone(): void
+    #[DataProvider('phoneNumbersProvider')]
+    public function PhoneValidation(string $number, bool $expected): void
     {
-        $className = 'libphonenumber\PhoneNumberUtil';
-
-        if (!class_exists($className)) {
-            $this->expectException(RuntimeException::class);
-            $this->expectExceptionMessage('The library "<a href="https://github.com/giggsey/libphonenumber-for-php" target="_blank" style="text-decoration: none;">giggsey/libphonenumber-for-php</a>" is required for phone number validation. Please install it using "composer require giggsey/libphonenumber-for-php".');
-            $result = Phone::validate('989358919279');
-        } else {
-            $numbers = ['989358919279', '+89358919279', '90212345678', '+39021234567'];
-
-            foreach ($numbers as $number) {
-                $this->expectException(\libphonenumber\NumberParseException::class);
-                $this->expectExceptionMessage('Missing or invalid default region');
-
-                $result = Phone::validate($number);
-
-                $this->assertFalse($result, "Phone number $number should be invalid.");
-            }
+        if (!class_exists(\libphonenumber\PhoneNumberUtil::class)) {
+            $this->expectException(\RuntimeException::class);
+            Phone::validate($number);
+            return;
         }
+
+        try {
+            $result = Phone::validate($number);
+        } catch (\libphonenumber\NumberParseException) {
+            $result = false;
+        }
+
+        $this->assertSame($expected, $result, "Phone number validation failed for: $number");
     }
 }

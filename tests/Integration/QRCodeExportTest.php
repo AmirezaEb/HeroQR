@@ -2,10 +2,8 @@
 
 namespace HeroQR\Tests\Integration;
 
-use HeroQR\DataTypes\DataType;
-use PHPUnit\Framework\TestCase;
-use HeroQR\Core\QRCodeGenerator;
-use PHPUnit\Framework\Attributes\Test;
+use HeroQR\{Core\QRCodeGenerator, DataTypes\DataType};
+use PHPUnit\Framework\{Attributes\DataProvider, Attributes\Test, TestCase};
 
 /**
  * Class QRCodeExportTest
@@ -23,65 +21,51 @@ class QRCodeExportTest extends TestCase
     }
 
     /**
-     * Test exporting QR code to PNG format
+     * Provides supported export formats
      */
-    #[Test]
-    public function isExportQrcodeToPng(): void
+    public static function formatProvider(): array
     {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('png');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
+        return [['png'], ['svg'], ['webp'], ['gif'], ['eps'], ['binary']];
     }
 
     /**
-     * Test exporting QR code to SVG format
+     * Test exporting QR code to multiple formats using a data provider
      */
     #[Test]
-    public function isExportQrcodeToSvg(): void
+    #[DataProvider('formatProvider')]
+    public function itExportsQrcodeToSupportedFormats(string $format): void
     {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
+        $this->prepareQRCodeGenerator();
 
-        $this->qrCodeGenerator->generate('svg');
+        $this->qrCodeGenerator->generate($format);
         $this->qrCodeGenerator->saveTo($this->outputPath);
 
-        $this->assertFileExists($this->outputPath . '.svg');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.svg'));
+        $file = $this->outputPath . '.' . ($format === 'binary' ? 'bin' : $format);
 
-        unlink($this->outputPath . '.svg');
+        $this->assertFileExists($file);
+        $this->assertNotEmpty(file_get_contents($file));
+
+        $this->deleteFile($file);
     }
 
     /**
-     * Test exporting QR code to PDF format
+     * Test exporting to PDF format conditionally
      */
     #[Test]
-    public function isExportQrcodeToPdf(): void
+    public function itExportsQrcodeToPdfIfAvailable(): void
     {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
+        $this->prepareQRCodeGenerator();
 
         if (class_exists('FPDF')) {
             $this->qrCodeGenerator->generate('pdf');
             $this->qrCodeGenerator->saveTo($this->outputPath);
-            $this->assertFileExists($this->outputPath . '.pdf');
-            $this->assertNotEmpty(file_get_contents($this->outputPath . '.pdf'));
-            unlink($this->outputPath . '.pdf');
+
+            $file = $this->outputPath . '.pdf';
+
+            $this->assertFileExists($file);
+            $this->assertNotEmpty(file_get_contents($file));
+
+            $this->deleteFile($file);
         } else {
             $this->expectException(\Exception::class);
             $this->expectExceptionMessage('Unable to find FPDF: check your installation');
@@ -90,103 +74,14 @@ class QRCodeExportTest extends TestCase
     }
 
     /**
-     * Test exporting QR code to webp format
+     * Test exporting with invalid format
      */
     #[Test]
-    public function isExportQrcodeToWebp(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('webp');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.webp');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.webp'));
-
-        unlink($this->outputPath . '.webp');
-    }
-
-    /**
-     * Test exporting QR code to Binary format
-     */
-    #[Test]
-    public function isExportQrcodeToBin(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('binary');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.bin');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.bin'));
-
-        unlink($this->outputPath . '.bin');
-    }
-
-    /**
-     * Test exporting QR code to Gif format
-     */
-    #[Test]
-    public function isExportQrcodeToGif(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('gif');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.gif');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.gif'));
-
-        unlink($this->outputPath . '.gif');
-    }
-
-    /**
-     * Test exporting QR code to Eps format
-     */
-    #[Test]
-    public function isExportQrcodeToEps(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('eps');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.eps');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.eps'));
-
-        unlink($this->outputPath . '.eps');
-    }
-
-    /**
-     * Test invalid format for exporting QR code
-     */
-    #[Test]
-    public function isExportQrcodeInvalidFormat(): void
+    public function itFailsExportingWithInvalidFormat(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
+        $this->prepareQRCodeGenerator();
         $this->qrCodeGenerator->generate('invalid-format');
     }
 
@@ -194,10 +89,31 @@ class QRCodeExportTest extends TestCase
      * Test export without calling generate() first
      */
     #[Test]
-    public function isExportWithoutGenerate(): void
+    public function itFailsExportingWithoutGenerateCall(): void
     {
         $this->expectException(\Error::class);
-
         $this->qrCodeGenerator->saveTo($this->outputPath);
+    }
+
+    /**
+     * Set up common QR code generator settings
+     */
+    private function prepareQRCodeGenerator(): void
+    {
+        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
+        $this->qrCodeGenerator->setSize(300);
+        $this->qrCodeGenerator->setMargin(20);
+        $this->qrCodeGenerator->setColor('#FF5733');
+        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
+    }
+
+    /**
+     * Delete generated file
+     */
+    private function deleteFile(string $file): void
+    {
+        if (file_exists($file)) {
+            unlink($file);
+        }
     }
 }

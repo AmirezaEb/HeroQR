@@ -3,77 +3,56 @@
 namespace HeroQR\Tests\Unit\DataTypes;
 
 use HeroQR\DataTypes\Location;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{Attributes\DataProvider, Attributes\Test, TestCase};
 
 /**
  * Class LocationTest
- * Tests the Location class.
+ * Tests the Location class
  */
 class LocationTest extends TestCase
 {
-    /**
-     * Test for validating valid geographic coordinates
+    /*
+     * Provides various coordinate strings and expected validation results
      */
-    #[Test]
-    public function isValidLocation(): void
+    public static function coordinatesProvider(): array
     {
-        $coordinates = [
-            '51.3890,12.3',
-            '51.3890,12.3,24',
-            '-45.123,-123.456',
-            '0,0',
-            '90,180',
-            '-90,-180',
-        ];
+        return [
+            # Valid coordinates
+            'Valid simple' => ['51.3890,12.3', true],
+            'Valid with altitude' => ['51.3890,12.3,24', true],
+            'Valid negative' => ['-45.123,-123.456', true],
+            'Valid zero' => ['0,0', true],
+            'Valid max' => ['90,180', true],
+            'Valid min' => ['-90,-180', true],
 
-        foreach ($coordinates as $coordinate) {
-            $result = Location::validate($coordinate);
-            $this->assertTrue($result, "Coordinates $coordinate should be valid");
-        }
+            # Invalid coordinates
+            'Invalid latitude high' => ['91,0', false],
+            'Invalid longitude high' => ['0,181', false],
+            'Invalid altitude text' => ['51.3890,12.3,abc', false],
+            'Invalid latitude text' => ['abc,12.3', false],
+            'Invalid longitude text' => ['51.3890,abc', false],
+            'Missing longitude' => ['51.3890', false],
+            'Too many parts' => ['51.3890,12.3,24,5', false],
+
+            # Malformed / empty
+            'Empty string' => ['', false],
+            'Only whitespace' => [' ', false],
+            'Only comma' => [',', false],
+            'Missing longitude value' => ['51.3890,', false],
+            'Missing latitude value' => [',12.3', false],
+            'Double comma' => ['51.3890,,12.3', false],
+            'Trailing comma' => ['51.3890, 12.3, ', false],
+        ];
     }
 
     /**
-     * Test for validating invalid geographic coordinates
+     * Tests location validation using various coordinates
      */
     #[Test]
-    public function isInvalidLocation(): void
+    #[DataProvider('coordinatesProvider')]
+    public function testLocationValidation(string $coordinate, bool $expected): void
     {
-        $coordinates = [
-            '91,0',
-            '0,181',
-            '51.3890,12.3,abc',
-            'abc,12.3',
-            '51.3890,abc',
-            '51.3890',
-            '51.3890,12.3,24,5',
-        ];
-
-        foreach ($coordinates as $coordinate) {
-            $result = Location::validate($coordinate);
-            $this->assertFalse($result, "Coordinates $coordinate should be invalid");
-        }
-    }
-
-    /**
-     * Test for validating empty and malformed geographic coordinates
-     */
-    #[Test]
-    public function isMalformedLocation(): void
-    {
-        $coordinates = [
-            '',
-            ' ',
-            ',',
-            '51.3890,',
-            ',12.3',
-            '51.3890,,12.3',
-            '51.3890, 12.3, ',
-        ];
-
-        foreach ($coordinates as $coordinate) {
-            $result = Location::validate($coordinate);
-            $this->assertFalse($result, "Coordinates $coordinate should be invalid");
-        }
+        $result = Location::validate($coordinate);
+        $this->assertSame($expected, $result, "Coordinate validation failed for: \"$coordinate\"");
     }
 }

@@ -2,10 +2,9 @@
 
 namespace HeroQR\Tests\Unit\Core\Writers;
 
-use PHPUnit\Framework\TestCase;
 use HeroQR\Core\QRCodeGenerator;
 use Endroid\QrCode\Matrix\Matrix;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{TestCase,Attributes\Test};
 
 /**
  * Class CustomPngWriterTest
@@ -13,7 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class CustomPngWriterTest extends TestCase
 {
-    private $qrCodeGenerator;
+    private QRCodeGenerator $qrCodeGenerator;
 
     /**
      * Setup method

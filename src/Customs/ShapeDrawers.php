@@ -30,8 +30,9 @@ class ShapeDrawers
             $points[] = intval($columnIndex * $baseBlockSize + $baseBlockSize / 2 + $radius * cos($angle));
             $points[] = intval($rowIndex * $baseBlockSize + $baseBlockSize / 2 - $radius * sin($angle));
         }
-        imagefilledpolygon($baseImage, $points, 10, $foregroundColor);
+        imagefilledpolygon($baseImage, $points, $foregroundColor);
     }
+
 
     /**
      * Draws a square shape on the image
@@ -62,7 +63,8 @@ class ShapeDrawers
         int      $columnIndex,
         int      $baseBlockSize,
         int      $foregroundColor
-    ): void {
+    ): void
+    {
         imagefilledellipse(
             $baseImage,
             intval($columnIndex * $baseBlockSize + $baseBlockSize / 2),
@@ -82,7 +84,8 @@ class ShapeDrawers
         int      $columnIndex,
         int      $baseBlockSize,
         int      $foregroundColor
-    ): void {
+    ): void
+    {
         $centerX = $columnIndex * $baseBlockSize + $baseBlockSize / 2;
         $centerY = $rowIndex * $baseBlockSize + $baseBlockSize / 2;
         $halfSize = $baseBlockSize / 2.2;
@@ -96,6 +99,17 @@ class ShapeDrawers
             $centerY + $halfSize,
             $centerX - $halfSize,
             $centerY,
-        ], 4, $foregroundColor);
+        ], $foregroundColor);  # فقط 3 تا آرگومان
+
+//        imagefilledpolygon($baseImage, [
+//            $centerX,
+//            $centerY - $halfSize,
+//            $centerX + $halfSize,
+//            $centerY,
+//            $centerX,
+//            $centerY + $halfSize,
+//            $centerX - $halfSize,
+//            $centerY,
+//        ], 4, $foregroundColor);
     }
 }

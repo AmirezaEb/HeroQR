@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace HeroQR\Contracts\Customs;
 
-use HeroQR\Customs\{ImageOverlay, ShapePaths};
 use Endroid\QrCode\{QrCodeInterface, RoundBlockSizeMode};
-use Endroid\QrCode\Label\{LabelAlignment, LabelInterface};
-use Endroid\QrCode\Writer\Result\{GdResult, ResultInterface};
-use Endroid\QrCode\ImageData\{LabelImageData, LogoImageData};
-use Endroid\QrCode\Writer\{WriterInterface, AbstractGdWriter};
 use Endroid\QrCode\{Logo\LogoInterface, Matrix\MatrixInterface};
+use Endroid\QrCode\ImageData\{LabelImageData, LogoImageData};
+use Endroid\QrCode\Label\{LabelAlignment, LabelInterface};
+use Endroid\QrCode\Writer\{WriterInterface, AbstractGdWriter};
+use Endroid\QrCode\Writer\Result\{GdResult, ResultInterface};
+use HeroQR\Customs\{ImageOverlay, ShapePaths};
 
 /**
  * The AbstractWriter class is responsible for generating QR code images using the GD library
@@ -163,7 +163,7 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
             $qrCode->getBackgroundColor()->getRed(),
             $qrCode->getBackgroundColor()->getGreen(),
             $qrCode->getBackgroundColor()->getBlue(),
-            $qrCode->getBackgroundColor()->getAlpha()
+            (int)round($qrCode->getBackgroundColor()->getAlpha() * 127 / 255)
         );
 
         imagefill($targetImage, 0, 0, $backgroundColor);

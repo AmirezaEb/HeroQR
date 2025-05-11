@@ -2,15 +2,10 @@
 
 namespace HeroQR\Tests\Unit\Managers;
 
-use Endroid\QrCode\QrCode;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Endroid\QrCode\Matrix\Matrix;
-use HeroQR\Managers\OutputManager;
-use Endroid\QrCode\QrCodeInterface;
-use Endroid\QrCode\Writer\PngWriter;
-use PHPUnit\Framework\Attributes\Test;
-use Endroid\QrCode\Writer\WriterInterface;
+use PHPUnit\Framework\{Attributes\Test,TestCase};
+use Endroid\QrCode\Writer\{PngWriter,WriterInterface};
+use Endroid\QrCode\{QrCodeInterface,Matrix\Matrix,QrCode};
+use HeroQR\{Managers\OutputManager,Contracts\Managers\OutputManagerInterface};
 
 /**
  * Class OutputManagerTest
@@ -18,7 +13,7 @@ use Endroid\QrCode\Writer\WriterInterface;
  */
 class OutputManagerTest extends TestCase
 {
-    private QrCodeInterface $qrCodeGenerator;
+    private QrCode $qrCodeGenerator;
     private OutputManager $outputManager;
 
     /** 
@@ -27,8 +22,13 @@ class OutputManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->qrCodeGenerator = new QrCode('https://example.com');
+        $this->assertInstanceOf(QrCodeInterface::class, $this->qrCodeGenerator);
+
         $this->outputManager = new OutputManager();
+        $this->assertInstanceOf(OutputManagerInterface::class, $this->outputManager);
+
     }
 
     /**
@@ -61,7 +61,7 @@ class OutputManagerTest extends TestCase
     #[Test]
     public function isSaveToUnsupportedFormat(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Format "mp4" Does Not Exist');
 
         $this->validateWriter('mp4');
@@ -147,13 +147,13 @@ class OutputManagerTest extends TestCase
         $writerClass = 'Endroid\\QrCode\\Writer\\' . ucfirst($format) . 'Writer';
 
         if (!class_exists($writerClass)) {
-            throw new InvalidArgumentException(sprintf('Format "%s" Does Not Exist', $format));
+            throw new \InvalidArgumentException(sprintf('Format "%s" Does Not Exist', $format));
         }
 
         $writer = new $writerClass();
 
         if (!$writer instanceof WriterInterface) {
-            throw new InvalidArgumentException(sprintf('Format "%s" Is Not Supported', $format));
+            throw new \InvalidArgumentException(sprintf('Format "%s" Is Not Supported', $format));
         }
 
         return $writer;

@@ -3,8 +3,7 @@
 namespace HeroQR\Tests\Unit\DataTypes;
 
 use HeroQR\DataTypes\Url;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{Attributes\DataProvider, Attributes\Test, TestCase};
 
 /**
  * Class UrlTest
@@ -13,33 +12,37 @@ use PHPUnit\Framework\Attributes\Test;
 class UrlTest extends TestCase
 {
     /**
-     * Test valid URL
+     * Provides a list of general URLs and their expected validation results
      */
-    #[Test]
-    public function isValidUrl(): void
+    public static function urlsTestingProvider(): array
     {
-        $urls = [
-            'https://example.com?search=test&sort=desc',
-            'https://www.example.com',
-            'https://HeroExpert.ir',
-            'https://github.com/AmirezaEb/HeroQR',
-            'https://www.example.com',
-            'http://example.com',
-            'https://example.org',
-            'https://subdomain.example.com',
-            'https://192.168.0.1',
-            'http://heroexpert.ir',
-            'https://www.example.co.uk',
-            'https://www.example.museum'
+        return [
+            'Valid .museum domain' => ['https://www.example.museum', true],
+            'Valid path' => ['https://example.com/path/to/page', true],
+            'Valid subdomain' => ['https://sub.example.com', true],
+            'Invalid scheme' => ['htt://www.example.co.uk', false],
+            'Only domain without scheme' => ['example.com', false],
+            'Missing scheme with www' => ['www.example.com', false],
+            'FTP scheme not allowed' => ['ftp://example.com', false],
+            'Invalid characters in domain' => ['https://exa mple.com', false],
+            'URL with @ in domain' => ['https://example@domain.com', false],
+            'Domain ends with dot' => ['https://www.invalid-url.', false],
+            'Illegal characters in URL' => ['http://heroexpert.ir*?>', false],
         ];
-
-        foreach ($urls as $url) {
-            $this->assertTrue(Url::validate($url), 'Valid URL failed validation' . $url);
-        }
     }
 
     /**
-     * Test URL with a long query string
+     * Test URL validation with multiple general cases
+     */
+    #[Test]
+    #[DataProvider('urlsTestingProvider')]
+    public function isValidUrl(string $url, bool $expected): void
+    {
+        $this->assertSame($expected, Url::validate($url), 'URL validation failed for: ' . $url);
+    }
+
+    /**
+     * Test URL with long query string
      */
     #[Test]
     public function isValidUrlWithLongQueryString(): void
@@ -49,7 +52,7 @@ class UrlTest extends TestCase
     }
 
     /**
-     * Test valid URL without security issues
+     * Test URL without security issues
      */
     #[Test]
     public function isValidUrlWithoutSecurityIssues(): void
@@ -66,25 +69,6 @@ class UrlTest extends TestCase
     {
         $url = 'http://127.0.0.1';
         $this->assertTrue(Url::validate($url), 'Valid URL with IP address failed validation');
-    }
-
-    /**
-     * Test URL with incorrect structure
-     */
-    #[Test]
-    public function isInvalidUrlWithIncorrectStructure(): void
-    {
-        $urls = [
-            'https://example@domain.com',
-            'https://<script>alert(1)</script>',
-            'https://HeroExpert.ir/../test',
-            'https://www.invalid-url.',
-            'http://heroexpert.ir*?>',
-        ];
-
-        foreach ($urls as $url) {
-            $this->assertFalse(Url::validate($url), 'Invalid URL with incorrect structure passed');
-        }
     }
 
     /**
@@ -126,7 +110,7 @@ class UrlTest extends TestCase
         $url = 'https://';
         $this->assertFalse(Url::validate($url), 'URL with only protocol passed validation');
     }
-    
+
     /**
      * Test empty URL
      */

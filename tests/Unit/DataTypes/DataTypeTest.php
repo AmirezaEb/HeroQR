@@ -1,10 +1,9 @@
-<?php 
+<?php
 
 namespace HeroQR\Tests\Unit\DataTypes;
 
 use HeroQR\DataTypes\DataType;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{Attributes\Test,TestCase};
 
 /**
  * Class DataTypeTest
@@ -20,8 +19,7 @@ class DataTypeTest extends TestCase
     {
         foreach (DataType::cases() as $case) {
             $class = $case->value;
-            $this->assertTrue(class_exists($class), 'Class $class does not exist');
+            $this->assertTrue(class_exists($class), "Class $class does not exist");
         }
     }
 }
-

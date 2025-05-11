@@ -2,10 +2,8 @@
 
 namespace HeroQR\Tests\Unit\Managers;
 
-use PHPUnit\Framework\TestCase;
-use HeroQR\Managers\LabelManager;
-use HeroQR\Managers\ColorManager;
-use PHPUnit\Framework\Attributes\Test;
+use HeroQR\Managers\{ColorManager,LabelManager};
+use PHPUnit\Framework\{Attributes\Test,TestCase};
 use HeroQR\Contracts\Managers\LabelManagerInterface;
 
 /**
@@ -14,7 +12,7 @@ use HeroQR\Contracts\Managers\LabelManagerInterface;
  */
 class LabelManagerTest extends TestCase
 {
-    private LabelManagerInterface $labelManager;
+    private LabelManager $labelManager;
 
     /**
      * Setup method
@@ -22,7 +20,10 @@ class LabelManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->labelManager = new LabelManager(new ColorManager());
+
+        $this->assertInstanceOf(LabelManagerInterface::class, $this->labelManager, 'The LabelManager must implement LabelManagerInterface');
     }
 
     /*** 
@@ -32,8 +33,6 @@ class LabelManagerTest extends TestCase
     public function isSetAndGetLabel(): void
     {
         $label = $this->labelManager;
-
-        $this->assertInstanceOf(LabelManagerInterface::class, $label, 'LabelManager Instance Is invalid');
 
         $label->setLabel('test label');
         $this->assertEquals('test label', $label->getLabel(), 'Label Text Does Not Match Expected Value');
@@ -124,7 +123,7 @@ class LabelManagerTest extends TestCase
 
         $label->setLabelColor('#FF573390');
         $customColor = $label->getLabelColor();
-        $this->assertEquals([255, 87, 51, 72], [$customColor->getRed(), $customColor->getGreen(), $customColor->getBlue(), $customColor->getAlpha()], 'Custom color values do not match expected');
+        $this->assertEquals([255, 87, 51, 144], [$customColor->getRed(), $customColor->getGreen(), $customColor->getBlue(), $customColor->getAlpha()], 'Custom color values do not match expected');
     }
 
     /*** 

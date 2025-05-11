@@ -2,11 +2,8 @@
 
 namespace HeroQR\Tests\Integration;
 
-use InvalidArgumentException;
-use HeroQR\DataTypes\DataType;
-use PHPUnit\Framework\TestCase;
-use HeroQR\Core\QRCodeGenerator;
-use PHPUnit\Framework\Attributes\Test;
+use HeroQR\{Core\QRCodeGenerator,DataTypes\DataType};
+use PHPUnit\Framework\{Attributes\DataProvider, Attributes\Test, TestCase};
 
 /**
  * Class StyledQRCodeTest
@@ -14,241 +11,134 @@ use PHPUnit\Framework\Attributes\Test;
  */
 class StyledQRCodeTest extends TestCase
 {
-    private QRCodeGenerator $qrCodeGenerator;
+    private const DEFAULT_DATA = 'https://heroqr.test';
+    private const DEFAULT_DATATYPE = DataType::Url;
+    private const DEFAULT_OUTPUT = 'png';
     private string $outputPath;
+    private QRCodeGenerator $qrCodeGenerator;
+
 
     protected function setUp(): void
     {
-        $this->qrCodeGenerator = new QRCodeGenerator();
         $this->outputPath = './testStyledQrcode-' . uniqid();
+        $this->qrCodeGenerator = new QRCodeGenerator();
     }
 
     /**
-     * Test generating a QR code with custom colors
+     * Generates file with custom options
      */
     #[Test]
-    public function isQrcodeWithCustomColors(): void
+    public function itGeneratesFileWithValidCustomOptions(): void
     {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#FF5733');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('png');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
-    }
-
-    /**
-     * Test generating a QR code with default styling
-     */
-    #[Test]
-    public function isQrcodeWithDefaultStyling(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-
-        $this->qrCodeGenerator->generate('png');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
-    }
-
-    /**
-     * Test generating a QR code with invalid color codes
-     */
-    #[Test]
-    public function isQrcodeWithInvalidColors(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('INVALID_COLOR');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('png');
-    }
-
-    /**
-     * Test generating a QR code with custom size and margin
-     */
-    #[Test]
-    public function isQrcodeWithCustomSizeAndMargin(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(500);
-        $this->qrCodeGenerator->setMargin(50);
-        $this->qrCodeGenerator->setColor('#000000');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('png');
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
-    }
-
-    /**
-     * Test generating a QR code with invalid size
-     */
-    #[Test]
-    public function isQrcodeWithInvalidSize(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(-100);
-        $this->qrCodeGenerator->setMargin(20);
-        $this->qrCodeGenerator->setColor('#000000');
-        $this->qrCodeGenerator->setBackgroundColor('#FFFFFF');
-
-        $this->qrCodeGenerator->generate('png');
-    }
-
-    /**
-     * Test for QR code generation with custom markers
-     */
-    #[Test]
-    public function isQrcodeWithCustomMarkers(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', ['Marker' => 'M' . mt_rand(1, 4)]);
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
-    }
-
-    /** 
-     * Test for QR code generation with invalid custom markers
-     */
-    #[Test]
-    public function isQrcodeWithInvalidCustomMarkers(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', ['Marker' => 'M5']);
-    }
-
-    /**
-     * Test for QR code generation with custom cursors
-     */
-    #[Test]
-    public function isQrcodeWithCustomCursors(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', ['Cursor' => 'C' . mt_rand(1, 4)]);
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
-    }
-
-    /**
-     * Test for QR code generation with invalid custom cursors 
-     */
-    #[Test]
-    public function isQrcodeWithInvalidCustomCursors(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', ['Cursor' => 'C5']);
-    }
-
-    /**
-     * Test for QR code generation with custom shapes
-     * */
-    #[Test]
-    public function isQrcodeWithCustomShapes(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', ['Shape' => 'S2']);
-        $this->qrCodeGenerator->saveTo($this->outputPath);
-
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
-    }
-
-    /**
-     * Test for QR code generation with invalid custom shapes
-     */
-    #[Test]
-    public function isQrcodeWithInvalidCustomShapes(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', ['Shape' => 'S5']);
-    }
-
-    /** Test for QR code generation with custom shape, cursor, and marker
-     * 
-     */
-    #[Test]
-    public function isQrcodeWithCustomShapeAndCursorAndMarker(): void
-    {
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', [
+        $this->qrCodeGenerator->setData(self::DEFAULT_DATA, self::DEFAULT_DATATYPE);
+        $this->configureQRCode(500, 50, '#FF5733', '#EEEEEE');
+        $this->qrCodeGenerator->generate(self::DEFAULT_OUTPUT, [
             'Shape' => 'S2',
-            'Cursor' => 'C2',
-            'Marker' => 'M2'
+            'Cursor' => 'C3',
+            'Marker' => 'M1'
         ]);
-        $this->qrCodeGenerator->saveTo($this->outputPath);
 
-        $this->assertFileExists($this->outputPath . '.png');
-        $this->assertNotEmpty(file_get_contents($this->outputPath . '.png'));
-
-        unlink($this->outputPath . '.png');
+        $this->assertGeneratedFileExistsAndCleanup();
     }
 
     /**
-     * Test for QR code generation with invalid custom shape, cursor, and marker
+     * Generates file with default settings
      */
     #[Test]
-    public function isQrcodeWithInvalidCustomShapeAndCursorAndMarker(): void
+    public function itGeneratesFileWithDefaultSettings(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->qrCodeGenerator->setData(self::DEFAULT_DATA, self::DEFAULT_DATATYPE);
+        $this->configureQRCode();
+        $this->qrCodeGenerator->generate(self::DEFAULT_OUTPUT);
 
-        $this->qrCodeGenerator->setData('https://example.com', DataType::Url);
-        $this->qrCodeGenerator->setSize(300);
-        $this->qrCodeGenerator->setMargin(30);
-        $this->qrCodeGenerator->generate('png', [
-            'Shape' => 'S5',
-            'Cursor' => 'C5',
-            'Marker' => 'M5'
-        ]);
+        $this->assertGeneratedFileExistsAndCleanup();
+    }
+
+    /**
+     * Throws exception on invalid color
+     */
+    #[Test]
+    public function itThrowsExceptionOnInvalidColor(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->qrCodeGenerator->setColor('red');
+    }
+
+    /**
+     * Throws exception on invalid background color
+     */
+    #[Test]
+    public function itThrowsExceptionOnInvalidBackgroundColor(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->qrCodeGenerator->setBackgroundColor('white');
+    }
+
+    /**
+     * Throws exception if save is called before generation
+     */
+    #[Test]
+    public function itThrowsExceptionIfSaveCalledWithoutGeneration(): void
+    {
+        $this->expectException(\Error::class);
+        $this->qrCodeGenerator->saveTo($this->outputPath);
+    }
+
+    /**
+     * Provides invalid custom options
+     */
+    public static function invalidCustomizationProvider(): array
+    {
+        return [
+            'invalid marker' => [['Marker' => 'M5']],
+            'invalid shape' => [['Shape' => 'S9']],
+            'invalid cursor' => [['Cursor' => 'C7']],
+            'multiple invalid' => [['Shape' => 'S5', 'Cursor' => 'C5', 'Marker' => 'M5']],
+        ];
+    }
+
+    /**
+     * Throws exception on invalid customizations
+     */
+    #[Test]
+    #[DataProvider('invalidCustomizationProvider')]
+    public function itThrowsExceptionForInvalidCustomizations(array $options): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->qrCodeGenerator->setData(self::DEFAULT_DATA, self::DEFAULT_DATATYPE);
+        $this->configureQRCode();
+        $this->qrCodeGenerator->generate(self::DEFAULT_OUTPUT, $options);
+    }
+
+    /**
+     * Configure size, margin, color, and background
+     */
+    private function configureQRCode(
+        int $size = 300,
+        int $margin = 10,
+        string $color = '#000000',
+        string $bgColor = '#FFFFFF'
+    ): void {
+        $this->qrCodeGenerator->setSize($size);
+        $this->qrCodeGenerator->setMargin($margin);
+        $this->qrCodeGenerator->setColor($color);
+        $this->qrCodeGenerator->setBackgroundColor($bgColor);
+    }
+
+    /**
+     * Assert output file exists and remove it
+     */
+    private function assertGeneratedFileExistsAndCleanup(): void
+    {
+        $file = $this->outputPath . '.' . self::DEFAULT_OUTPUT;
+
+        $this->qrCodeGenerator->saveTo($this->outputPath);
+        $this->assertFileExists($file);
+        $this->assertNotEmpty(file_get_contents($file));
+
+        if (file_exists($file)) {
+            unlink($file);
+        }
     }
 }

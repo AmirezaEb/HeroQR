@@ -2,20 +2,17 @@
 
 namespace HeroQR\Tests\Unit\Customs;
 
-use PHPUnit\Framework\TestCase;
 use HeroQR\Customs\ShapeDrawers;
-use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\{Attributes\Test, TestCase};
 
 /**
  * Class ShapeDrawersTest
  * Tests the ShapeDrawers class.
  */
-
 class ShapeDrawersTest extends TestCase
 {
-    private $image;
-    private $foregroundColor;
-    private $backgroundColor;
+    private false|\GdImage $image;
+    private int|false $foregroundColor;
 
     /**
      * Setup method
@@ -24,8 +21,8 @@ class ShapeDrawersTest extends TestCase
     {
         $this->image = imagecreatetruecolor(100, 100);
         $this->foregroundColor = imagecolorallocate($this->image, 255, 0, 0);
-        $this->backgroundColor = imagecolorallocate($this->image, 255, 255, 255);
-        imagefill($this->image, 0, 0, $this->backgroundColor);
+        $backgroundColor = imagecolorallocate($this->image, 255, 255, 255);
+        imagefill($this->image, 0, 0, $backgroundColor);
     }
 
     /**
@@ -48,7 +45,7 @@ class ShapeDrawersTest extends TestCase
         $this->assertGreaterThan(50, $coloredPixelCount, "Square shape was not drawn correctly.");
     }
 
-    /** 
+    /**
      * Test drawing a circle
      */
     #[Test]
@@ -82,7 +79,6 @@ class ShapeDrawersTest extends TestCase
     /**
      * Test drawing a star.
      */
-    /*
     #[Test]
     public function isCanDrawStar(): void
     {
@@ -91,14 +87,10 @@ class ShapeDrawersTest extends TestCase
         $coloredPixelCount = $this->countColoredPixels($this->foregroundColor);
         $this->assertGreaterThan(50, $coloredPixelCount, "Star shape was not drawn correctly.");
     }
-    */
 
-
-
-    /** 
+    /**
      * Test drawing a diamond.
      */
-    /*
     #[Test]
     public function isCanDrawDiamond(): void
     {
@@ -107,5 +99,4 @@ class ShapeDrawersTest extends TestCase
         $coloredPixelCount = $this->countColoredPixels($this->foregroundColor);
         $this->assertGreaterThan(50, $coloredPixelCount, "Diamond shape was not drawn correctly.");
     }
-    */
 }

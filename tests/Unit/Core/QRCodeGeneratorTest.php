@@ -2,13 +2,9 @@
 
 namespace HeroQR\Tests\Unit\Core;
 
-use PHPUnit\Framework\Attributes\Test;
 use Endroid\QrCode\Matrix\Matrix;
-use HeroQR\Core\QRCodeGenerator;
-use PHPUnit\Framework\TestCase;
-use HeroQR\DataTypes\DataType;
-use InvalidArgumentException;
-use Error;
+use PHPUnit\Framework\{Attributes\Test,TestCase};
+use HeroQR\{Core\QRCodeGenerator,DataTypes\DataType};
 
 /**
  * Class QRCodeGeneratorTest
@@ -42,7 +38,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isSetDataInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->qrCodeGenerator->setData('invalid-url', DataType::Url);
     }
 
@@ -62,7 +58,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isSetSizeInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->qrCodeGenerator->setSize(-50);
     }
 
@@ -82,7 +78,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isSetMarginInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->qrCodeGenerator->setMargin(-10);
     }
 
@@ -103,7 +99,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isSetColorInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->qrCodeGenerator->setColor('invalid-color');
     }
 
@@ -124,7 +120,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isSetBackgroundColorInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->qrCodeGenerator->setBackgroundColor('invalid-color');
     }
 
@@ -147,7 +143,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isSetLogoInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->qrCodeGenerator->setLogo('invalid/path/to/logo.png', 50);
     }
 
@@ -179,7 +175,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isGetMatrixWithoutGenerate(): void
     {
-        $this->expectException(Error::class);
+        $this->expectException(\Error::class);
         $this->qrCodeGenerator->getMatrix();
     }
 
@@ -200,7 +196,7 @@ class QRCodeGeneratorTest extends TestCase
     #[Test]
     public function isGenerateInvalidFormat(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->qrCodeGenerator->generate('invalid-format');
     }
 

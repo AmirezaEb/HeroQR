@@ -2,11 +2,8 @@
 
 namespace HeroQR\Tests\Unit\Managers;
 
-use PHPUnit\Framework\TestCase;
-use HeroQR\Managers\ColorManager;
-use PHPUnit\Framework\Attributes\Test;
-use Endroid\QrCode\Color\ColorInterface;
-use HeroQR\Contracts\Managers\ColorManagerInterface;
+use PHPUnit\Framework\{Attributes\Test, TestCase};
+use HeroQR\{Contracts\Managers\ColorManagerInterface, Managers\ColorManager};
 
 /**
  * Class ColorManagerTest
@@ -14,7 +11,7 @@ use HeroQR\Contracts\Managers\ColorManagerInterface;
  */
 class ColorManagerTest extends TestCase
 {
-    private ColorManagerInterface $colorManager;
+    private ColorManager $colorManager;
 
     /**
      * Setup method
@@ -22,7 +19,10 @@ class ColorManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->colorManager = new ColorManager();
+
+        $this->assertInstanceOf(ColorManagerInterface::class, $this->colorManager, 'The colorManager must implement ColorInterface');
     }
 
     /**
@@ -33,18 +33,13 @@ class ColorManagerTest extends TestCase
     {
         $colorManager = $this->colorManager;
 
-        $this->assertInstanceOf(ColorManagerInterface::class, $colorManager, 'The instance should implement ColorManagerInterface');
-
         $defaultColor = $colorManager->getColor();
-        $this->assertInstanceOf(ColorInterface::class, $defaultColor, 'The default QR code color should be an instance of ColorInterface');
         $this->assertEquals([0, 0, 0], [$defaultColor->getRed(), $defaultColor->getGreen(), $defaultColor->getBlue()], 'The default QR code color should be black');
 
         $defaultBackgroundColor = $colorManager->getBackgroundColor();
-        $this->assertInstanceOf(ColorInterface::class, $defaultBackgroundColor, 'The default background color should be an instance of ColorInterface');
         $this->assertEquals([255, 255, 255], [$defaultBackgroundColor->getRed(), $defaultBackgroundColor->getGreen(), $defaultBackgroundColor->getBlue()], 'The default background color should be white.');
 
         $defaultLabelColor = $colorManager->getLabelColor();
-        $this->assertInstanceOf(ColorInterface::class, $defaultLabelColor, 'The default label color should be an instance of ColorInterface');
         $this->assertEquals([0, 0, 0], [$defaultLabelColor->getRed(), $defaultLabelColor->getGreen(), $defaultLabelColor->getBlue()], 'The default label color should be black.');
     }
 
@@ -57,9 +52,8 @@ class ColorManagerTest extends TestCase
         $colorManager = $this->colorManager;
 
         $colorManager->setColor('#FF5733');
-
         $customColor = $colorManager->getColor();
-        $this->assertInstanceOf(ColorInterface::class, $customColor, 'The custom QR code color should be an instance of ColorInterface.');
+
         $this->assertEquals([255, 87, 51], [$customColor->getRed(), $customColor->getGreen(), $customColor->getBlue()], 'The custom QR code color should match the provided hex value');
     }
 
@@ -72,9 +66,8 @@ class ColorManagerTest extends TestCase
         $colorManager = $this->colorManager;
 
         $colorManager->setBackgroundColor('#33FF57');
-
         $backgroundColor = $colorManager->getBackgroundColor();
-        $this->assertInstanceOf(ColorInterface::class, $backgroundColor, 'The custom background color should be an instance of ColorInterface');
+
         $this->assertEquals([51, 255, 87], [$backgroundColor->getRed(), $backgroundColor->getGreen(), $backgroundColor->getBlue()], 'The custom background color should match the provided hex value');
     }
 
@@ -87,9 +80,8 @@ class ColorManagerTest extends TestCase
         $colorManager = $this->colorManager;
 
         $colorManager->setLabelColor('#3357FF');
-
         $labelColor = $colorManager->getLabelColor();
-        $this->assertInstanceOf(ColorInterface::class, $labelColor, 'The custom label color should be an instance of ColorInterface');
+
         $this->assertEquals([51, 87, 255], [$labelColor->getRed(), $labelColor->getGreen(), $labelColor->getBlue()], 'The custom label color should match the provided hex value');
     }
 
@@ -103,9 +95,61 @@ class ColorManagerTest extends TestCase
 
         $reflection = new \ReflectionClass(ColorManager::class);
         $hex2rgbMethod = $reflection->getMethod('hex2rgb');
-        $hex2rgbMethod->setAccessible(true);
 
-        $invalidColor = $hex2rgbMethod->invokeArgs($colorManager, ['invalid']);
-        $this->assertEquals([0, 0, 0], [$invalidColor->getRed(), $invalidColor->getGreen(), $invalidColor->getBlue()], 'Invalid hex color should return default black color [0, 0, 0]');
+        $fallbackColor = $hex2rgbMethod->invokeArgs($colorManager, ['fffffff']);
+
+        $this->assertNotNull($fallbackColor, 'Expected a fallback color object');
+        $this->assertEquals([0, 0, 0], [$fallbackColor->getRed(), $fallbackColor->getGreen(), $fallbackColor->getBlue()], 'Invalid hex input should fallback to black color [0, 0, 0]');
+    }
+
+    /**
+     * Test the behavior of the hex2rgb method with a valid hex color
+     */
+    #[Test]
+    public function isHex2RgbValidColor(): void
+    {
+        $colorManager = $this->colorManager;
+
+        $reflection = new \ReflectionClass(ColorManager::class);
+        $hex2rgbMethod = $reflection->getMethod('hex2rgb');
+
+        $color = $hex2rgbMethod->invokeArgs($colorManager, ['#EFEFEF']);
+
+        $this->assertNotNull($color, 'Expected a valid color object');
+        $this->assertEquals([239, 239, 239], [$color->getRed(), $color->getGreen(), $color->getBlue()], 'The hex color #EFEFEF should correctly convert to RGB [239, 239, 239]');
+    }
+
+    /**
+     * Test the behavior of the hex2rgb method with a valid hex color with alpha channel
+     */
+    #[Test]
+    public function isHex2RgbaValidColor(): void
+    {
+        $colorManager = $this->colorManager;
+
+        $reflection = new \ReflectionClass(ColorManager::class);
+        $hex2rgbMethod = $reflection->getMethod('hex2rgb');
+
+        $color = $hex2rgbMethod->invokeArgs($colorManager, ['#FF000080']);
+
+        $this->assertNotNull($color, 'Expected a valid color object');
+        $this->assertEquals([255, 0, 0, 128], [$color->getRed(), $color->getGreen(), $color->getBlue(), $color->getAlpha()], 'RGBA values should correctly reflect the hex input #FF000080');
+    }
+
+    /**
+     * Test the behavior of the hex2rgb method with an invalid hex color with alpha channel
+     */
+    #[Test]
+    public function isHex2RgbaInvalidColor(): void
+    {
+        $colorManager = $this->colorManager;
+
+        $reflection = new \ReflectionClass(ColorManager::class);
+        $hex2rgbMethod = $reflection->getMethod('hex2rgb');
+
+        $color = $hex2rgbMethod->invokeArgs($colorManager, ['#FF5733GG']);
+
+        $this->assertNotNull($color, 'Expected a valid color object');
+        $this->assertEquals([0, 0, 0, 0], [$color->getRed(), $color->getGreen(), $color->getBlue(), $color->getAlpha()], 'Invalid hex color should return default black color [0, 0, 0, 0]');
     }
 }
