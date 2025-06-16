@@ -90,10 +90,10 @@ class StyledQRCodeTest extends TestCase
     public static function invalidCustomizationProvider(): array
     {
         return [
-            'invalid marker' => [['Marker' => 'M9']],
-            'invalid shape' => [['Shape' => 'S9']],
-            'invalid cursor' => [['Cursor' => 'C9']],
-            'multiple invalid' => [['Shape' => 'S9', 'Cursor' => 'C9', 'Marker' => 'M5']],
+            'invalid marker' => [['Marker' => 'M7']],
+            'invalid shape' => [['Shape' => 'S5']],
+            'invalid cursor' => [['Cursor' => 'C7']],
+            'multiple invalid' => [['Shape' => 'S5', 'Cursor' => 'C7', 'Marker' => 'M7']],
         ];
     }
 
