@@ -1,6 +1,6 @@
 # HeroQR - A Powerful PHP QR Code Library
 
-**Last Updated**: May 2025   
+**Last Updated**: June 2025   
 **Author**: Amirreza Ebrahimi   
 **Contributors**: None yet   
 **License**: MIT License
@@ -10,26 +10,26 @@
 ## Table of Contents
 
 - [HeroQR Library](#heroqr---a-powerful-php-qr-code-library)
-  - [Features](#features)
-  - [Getting Started](#getting-started)
-    - [1. Installation](#1-installation) 
-    - [2. Basic Usage](#2-basic-usage)
-    - [3. Advanced Customization](#3-advanced-customization)
-    - [4. Customizing Shapes Markers and Cursors (PNG Only)](#4-customizing-shapes-markers-and-cursors-png-only)
-    - [5. Advanced Output Options](#5-advanced-output-options)
-  - [Project Structure](#project-structure)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contact](#contact)
+    - [Features](#features)
+    - [Getting Started](#getting-started)
+        - [1. Installation](#1-installation)
+        - [2. Basic Usage](#2-basic-usage)
+        - [3. Advanced Customization](#3-advanced-customization)
+        - [4. Customizing Shapes Markers and Cursors (PNG Only)](#4-customizing-shapes-markers-and-cursors-png-only)
+        - [5. Advanced Output Options](#5-advanced-output-options)
+    - [Project Structure](#project-structure)
+    - [Contributing](#contributing)
+    - [License](#license)
+    - [Contact](#contact)
 
 ## Features
 
 - **Advanced Customization Options:**
-  - Adjust logo size and embed logos into QR codes.
-  - Automatically adjust QR code layout and margins to ensure proper scaling.
-  - Change QR code and background colors (RGB or RGBA), including transparency options.
-  - Add customizable labels with options for color (RGB or RGBA), size, alignment, and margin.
-  - Support for various encoding formats such as BASE64, UTF-8, UTF-16, and others.
+    - Adjust logo size and embed logos into QR codes.
+    - Automatically adjust QR code layout and margins to ensure proper scaling.
+    - Change QR code and background colors (RGB or RGBA), including transparency options.
+    - Add customizable labels with options for color (RGB or RGBA), size, alignment, and margin.
+    - Support for various encoding formats such as BASE64, UTF-8, UTF-16, and others.
 
 - **Shape, Marker, and Cursor Customization:**
   HeroQR offers enhanced design control by allowing customization of the geometric shape of QR code points, as well as markers and cursors.These features are support:
@@ -37,16 +37,16 @@
     - `M` for Marker type.
     - `C` for Cursor type.
     - Available marker and cursor types:
-      - **Shapes:** `S1`, `S2`, `S3`, `S4`
-      - **Markers:** `M1`, `M2`, `M3`, `M4`
-      - **Cursors:** `C1`, `C2`, `C3`, `C4`
+        - **Shapes:** `S1` - `S2` - `S3` - `S4`
+        - **Markers:** `M1` - `M2` - `M3` - `M4` - `M5` - `M6`
+        - **Cursors:** `C1` - `C2` - `C3` - `C4` - `C5` - `C6`
     - **Note:** This feature is available only for PNG format at the moment, but additional formats will be supported in future updates.
 
-- **Multi-Format Data Encoding:**
-  Easily encode different data types, including URLs, text, emails, business cards, and payment information, ensuring flexibility for all your QR code needs.
+- **Multi-Format Data Encoding:**  
+  Support for encoding a wide range of data types — including URLs, plain text, emails, business cards, and payment information — so you can generate the right QR code for any use case.
 
-- **Data Validation:**
-  The library provides validation for various data types such as URLs, text, emails, phone numbers, IP addresses, and Wi-Fi, ensuring the accuracy and validity of input data.
+- **Built-In Data Validation:** 
+  To prevent errors and ensure reliability, the library automatically validates input for common types such as URLs, emails, phone numbers, IP addresses, and Wi-Fi credentials before encoding.
 
 - **Flexible Export Options:**
   QR codes can be exported in various formats, including PDF, SVG, PNG, Binary, GIF, EPS, and WebP. If custom shapes, markers, or cursors are not required, you can choose from these formats for the output.
@@ -64,7 +64,6 @@ Use [Composer](https://getcomposer.org/) to install the library. Also make sure 
 ```bash
 composer require amirezaeb/heroqr
 ```
-
 
 ### 2. Basic Usage
 
@@ -93,8 +92,8 @@ $qrCode->saveTo('qrcode');
 
 - **Fully customize the appearance and functionality of your QR code with automatic data validation:**
 
-  - **Customization Options:** Modify various parameters such as size, color, logo, and more.
-  - **Automatic Data Validation:** By using `DataType` (optional), the library automatically validates the type of data being encoded (e.g., URL, Email, Phone, Location, Wifi, Text).
+    - **Customization Options:** Modify various parameters such as size, color, logo, and more.
+    - **Automatic Data Validation:** By using `DataType` (optional), the library automatically validates the type of data being encoded (e.g., URL, Email, Phone, Location, Wifi, Text).
 
 #### Example :
 
@@ -146,12 +145,13 @@ With these options, you can create visually appealing QR codes that align with y
 
 ### 4. Customizing Shapes, Markers, and Cursors (PNG Only)
 
-HeroQR allows you to fully customize the markers, cursors, and shapes of your QR codes. This feature is exclusive to PNG output. To use this feature, specify the output format with `generate('png', [ ... ])` and include the desired parameters for shape, marker, and cursor types. 
+HeroQR allows you to fully customize the markers, cursors, and shapes of your QR codes. This feature is exclusive to PNG output. To use this feature, specify the output format with `generate('png', [ ... ])` and include the desired parameters for shape, marker, and cursor types.
 
 #### Available Options:
-- **Shapes**: `S1`, `S2`, `S3`, `S4`
-- **Markers**: `M1`, `M2`, `M3`, `M4`
-- **Cursors**: `C1`, `C2`, `C3`, `C4`
+
+- **Shapes**: `S1` - `S2` - `S3` - `S4`
+- **Markers**: `M1` - `M2` - `M3` - `M4` - `M5` - `M6`
+- **Cursors**: `C1` - `C2` - `C3` - `C4` - `C5` - `C6`
 
 These options allow you to modify the appearance of the QR code, making it more personalized or stylish. Shapes modify the corners, markers change the patterns on the dots, and cursors adjust the positioning pointers.
 
@@ -170,7 +170,7 @@ $qrCode = $qrCodeManager
     ->setSize(800)
     ->setBackgroundColor('#ffffffFF')
     ->setColor('#000000')
-    # Customize the Shape (S2), Marker (M2), and Cursor (C2)
+    # Customize the Shape (Circle), Marker (Circle), and Cursor (Circle)
     ->generate('png',[
             'Shape' => 'S2',
             'Marker' => 'M2',
@@ -183,12 +183,14 @@ $qrCode->saveTo('custom-qr');
 
 **Example QR Code Outputs with Different Combinations :** Below are some examples of QR codes generated using various combinations of shapes, markers, and cursors:
 
-| Combination  | Shape            | Marker           | Cursor           | Preview                                                                                    |
-| ------------ | ---------------- | ---------------- | ---------------- | ------------------------------------------------------------------------------------------ |
-| **S1-M1-C1** | Default (Square) | Default (Square) | Default (Square) | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S1-M1-C1.png) |
-| **S2-M2-C2** | Circle           | Custom Marker 1         | Custom Cursor 1         | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S2-M2-C2.png) |
-| **S3-M3-C3** | Star             | Custom Marker 2         | Custom Cursor 2         | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S3-M3-C3.png) |
-| **S4-M4-C4** | Diamond          | Custom Marker 3         | Custom Cursor 3         | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M4-C4.png) |
+| Combination  | Shape            | Marker             | Cursor             | Preview                                                                                              |
+|--------------|------------------|--------------------|--------------------|------------------------------------------------------------------------------------------------------|
+| **S1-M1-C1** | Square (Default) | Square (Default)   | Square (Default)   | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S1-M1-C1.png) |
+| **S2-M2-C2** | Circle (Custom)  | Circle (Custom)    | Circle (Custom)    | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S2-M2-C2.png) |
+| **S3-M3-C3** | Star (Custom)    | D-Drop-O (Custom)  | D-Drop-O (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S3-M3-C3.png) |
+| **S4-M4-C4** | Diamond (Custom) | D-Drop-I (Custom)  | D-Drop-I (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M4-C4.png) |
+| **S4-M5-C5** | Diamond (Custom) | D-Drop-IO (Custom) | D-Drop-IO (Custom) | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M5-C5.png) |
+| **S4-M6-C6** | Diamond (Custom) | Square-O (Custom)  | Square-O (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M6-C6.png) |
 
 - **Experiment with Different Combinations:** In this section, you can experiment with various combinations of shapes, markers, and cursors to create unique QR codes that best suit your needs. Each combination will impact the appearance of the QR code, from the corners and points to the positioning of the markers. Simply adjust the parameters to customize your QR codes.
 
@@ -239,7 +241,7 @@ $qrCode->saveTo('qr_code_output');
 
 ```
 
-## Project Structure  
+## Project Structure
 
 The modular structure of HeroQR is designed to enhance efficiency and scalability, making it easier to use, maintain, and expand:
 
@@ -247,7 +249,7 @@ The modular structure of HeroQR is designed to enhance efficiency and scalabilit
 
 - **Core :** Houses the primary logic for generating and managing QR codes, acting as the foundation of the library.
 
-- **DataTypes :** Provides definitions and automatic validation for various data types (wifi, Location, URL, Email, Phone, Text). This eliminates the need for users to manually validate their input.
+- **DataTypes :** Provides definitions and automatic validation for various data types (WiFi, Location, URL, Email, Phone, Text). This eliminates the need for users to manually validate their input.
 
 - **Managers :** Oversees the customization and processing of QR codes, enabling users to have full control over the appearance and functionality of their QR codes.
 
@@ -260,12 +262,11 @@ The modular structure of HeroQR is designed to enhance efficiency and scalabilit
 We welcome contributions and appreciate your interest in improving the project! Here's how you can contribute:
 
 1. **Fork the repository:** Create your own copy of the repository by forking it.
-   
+
 2. **Clone your fork:** Clone the repository to your local machine:
   ```bash
   git clone https://github.com/AmirezaEb/HeroQR.git
   ```
-
 3. **Create a feature branch:** Create a new branch for your feature or bug fix.
 
 4. **Make changes:** Work on your feature or fix the issue.
@@ -273,18 +274,20 @@ We welcome contributions and appreciate your interest in improving the project! 
 5. **Write tests:** Ensure your changes are covered by tests. If you're fixing a bug, add a test to verify the fix.
 
 6. **Commit your changes:** Commit your changes with clear, descriptive messages.
+
 ```bash
 git commit -m 'Add feature-name or fix issue #123'
 ```
 
 7. **Push your branch:** Push your changes to your forked repository.
+
 ```bash
 git push origin feature-name
 ```
 
 8. **Open a Pull Request:** Once your branch is pushed, open a Pull Request on GitHub for review. Be sure to:
-   - Provide a clear description of what your changes do.
-   - Include any relevant issue numbers (e.g., Fixes #123).
+    - Provide a clear description of what your changes do.
+    - Include any relevant issue numbers (e.g., Fixes #123).
 
 9. **Participate in the review process:** After submitting the pull request, review any feedback and make necessary changes.
 
@@ -297,6 +300,7 @@ HeroQR is released under the [MIT License](LICENSE), giving you the freedom to u
 ## Contact
 
 For inquiries or feedback, feel free to reach out via email, GitHub issues, or LinkedIn:
+
 - **Author :** Amirreza Ebrahimi
 - **Email :** aabrahimi1718@gmail.com
 - **GitHub Issues :** [GitHub Repository](https://github.com/AmirezaEb/HeroQR/issues)

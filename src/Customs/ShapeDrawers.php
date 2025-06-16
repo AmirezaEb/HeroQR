@@ -99,17 +99,6 @@ class ShapeDrawers
             $centerY + $halfSize,
             $centerX - $halfSize,
             $centerY,
-        ], $foregroundColor);  # فقط 3 تا آرگومان
-
-//        imagefilledpolygon($baseImage, [
-//            $centerX,
-//            $centerY - $halfSize,
-//            $centerX + $halfSize,
-//            $centerY,
-//            $centerX,
-//            $centerY + $halfSize,
-//            $centerX - $halfSize,
-//            $centerY,
-//        ], 4, $foregroundColor);
+        ], $foregroundColor);
     }
 }
