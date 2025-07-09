@@ -3,8 +3,9 @@
 namespace HeroQR\Tests\Unit\Core;
 
 use Endroid\QrCode\Matrix\Matrix;
-use PHPUnit\Framework\{Attributes\Test,TestCase};
-use HeroQR\{Core\QRCodeGenerator,DataTypes\DataType};
+use HeroQR\{Core\QRCodeGenerator, DataTypes\DataType};
+use PHPUnit\Framework\{Attributes\DataProvider, Attributes\Test, TestCase};
+use http\Exception\InvalidArgumentException;
 
 /**
  * Class QRCodeGeneratorTest
@@ -213,5 +214,94 @@ class QRCodeGeneratorTest extends TestCase
         $this->assertTrue($this->qrCodeGenerator->saveTo($outputPath));
         $this->assertFileExists($outputPath . '.' . $outputFormat);
         unlink($outputPath . '.' . $outputFormat);
+    }
+
+    /**
+     * Data provider valid error correction levels
+     */
+    public static function validLevelsProvider(): array
+    {
+        return [
+            ['Low', 'low'],
+            ['medium', 'medium'],
+            ['Quartile', 'quartile'],
+            ['high', 'high'],
+        ];
+    }
+
+    /**
+     * Test setting valid error correction levels (case-insensitive)
+     */
+    #[Test]
+    #[DataProvider('validLevelsProvider')]
+    public function isSetValidErrorCorrectionLevel(string $level, string $expected): void
+    {
+        $this->qrCodeGenerator->setErrorCorrectionLevel($level);
+        $this->assertSame($expected, $this->qrCodeGenerator->getErrorCorrectionLevel()->value);
+    }
+
+    /**
+     * Data provider Invalid error correction levels
+     */
+    public static function invalidLevelsProvider(): array
+    {
+        return [['L'], ['M'], ['Q'], ['H'], ['invalid']];
+    }
+
+    /**
+     * Test setting invalid error correction levels throws exception
+     */
+    #[Test]
+    #[DataProvider('invalidLevelsProvider')]
+    public function isSetInvalidErrorCorrectionLevel(string $level): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid error correction level. Accepted values: high, low, medium, quartile.');
+
+        $this->qrCodeGenerator->setErrorCorrectionLevel($level);
+    }
+
+    /**
+     * Data provider valid block size modes
+     */
+    public static function validBlockSizeModeProvider(): array
+    {
+        return [
+            ['enlarge', 'enlarge'],
+            ['Margin', 'margin'],
+            ['nOne', 'none'],
+            ['Shrink', 'shrink'],
+        ];
+    }
+
+    /**
+     * Test setting valid block size modes (case-insensitive)
+     */
+    #[Test]
+    #[DataProvider('validBlockSizeModeProvider')]
+    public function isSetValidBlockSizeMode(string $mode, string $expected): void
+    {
+        $this->qrCodeGenerator->setBlockSizeMode($mode);
+        $this->assertSame($expected, $this->qrCodeGenerator->getBlockSizeMode()->value);
+    }
+
+    /**
+     * Data Provider invalid block size modes
+     */
+    public static function invalidBlockSizeModeProvider(): array
+    {
+        return [['E'], ['M'], ['N'], ['S']];
+    }
+
+    /**
+     * Test setting invalid block size modes throws exception
+     */
+    #[Test]
+    #[DataProvider('invalidBlockSizeModeProvider')]
+    public function isSetInvalidBlockSizeMode(string $mode): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid round block size mode. Accepted values: enlarge, margin, none, shrink.');
+        $this->qrCodeGenerator->setBlockSizeMode($mode);
     }
 }

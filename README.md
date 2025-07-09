@@ -1,6 +1,6 @@
 # HeroQR - A Powerful PHP QR Code Library
 
-**Last Updated**: June 2025   
+**Last Updated**: July 2025   
 **Author**: Amirreza Ebrahimi   
 **Contributors**: None yet   
 **License**: MIT License
@@ -118,9 +118,13 @@ $qrCode = $qrCodeManager
     # Set the logo to be embedded at the center (default size is 80)
     ->setLogo('../assets/HeroExpert.png', 100 )
     # Set the margin around the QR code (default size is 10)
-    ->setMargin(20)
+    ->setMargin(0)
     # Set character encoding for the QR code (default encoding is UTF-8)
     ->setEncoding('CP866')
+    # Set the error correction level for the QR code (default is "High")
+    ->setErrorCorrectionLevel('Medium')
+    # Set the block size mode to "None" (default is "Margin")
+    ->setBlockSizeMode('None')
     # Customize the label with text, alignment, color, and font size
     ->setLabel(
         # Label Text
@@ -273,14 +277,14 @@ We welcome contributions and appreciate your interest in improving the project! 
 
 5. **Write tests:** Ensure your changes are covered by tests. If you're fixing a bug, add a test to verify the fix.
 
-6. **Commit your changes:** Commit your changes with clear, descriptive messages.
+6. **Commit your changes:** Commit your changes with clear, descriptive messages following a conventional format.
 
 ```bash
-git commit -m 'Add feature-name or fix issue #123'
+git commit -m '<type>[optional scope]: <description>'
 ```
 
-7. **Push your branch:** Push your changes to your forked repository.
-
+7. **Push your branch:** Push your changes to your forked repository branch.
+   
 ```bash
 git push origin feature-name
 ```
@@ -305,7 +309,7 @@ For inquiries or feedback, feel free to reach out via email, GitHub issues, or L
 - **Email :** aabrahimi1718@gmail.com
 - **GitHub Issues :** [GitHub Repository](https://github.com/AmirezaEb/HeroQR/issues)
 - **LinkedIn :** [My LinkedIn](https://www.linkedin.com/in/amireza-eb)
-
+- **Telegram :** [My Telegram](https://t.me/a_m_b_r)
 ---
 
 Transform your projects with HeroQR today! 🚀

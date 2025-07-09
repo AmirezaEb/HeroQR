@@ -3,10 +3,10 @@
 namespace HeroQR\Core;
 
 use Endroid\QrCode\{Builder\Builder, Matrix\Matrix};
-use HeroQR\{DataTypes\DataType,Contracts\QRCodeGeneratorInterface};
+use Endroid\QrCode\{Color\ColorInterface, ErrorCorrectionLevel, Exception\ValidationException, RoundBlockSizeMode};
 use Endroid\QrCode\Writer\{Result\ResultInterface, WriterInterface};
-use Endroid\QrCode\{Color\ColorInterface, ErrorCorrectionLevel, Exception\ValidationException};
-use HeroQR\Managers\{ColorManager, LabelManager, WriterManager,EncodingManager, LogoManager, OutputManager};
+use HeroQR\{Contracts\QRCodeGeneratorInterface, DataTypes\DataType};
+use HeroQR\Managers\{ColorManager, EncodingManager, LabelManager, LogoManager, OutputManager, WriterManager};
 
 /**
  * Handles the generation of QR codes with customizable options.
@@ -22,6 +22,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
 {
     private ?ResultInterface $builder = null;
     private LabelManager $labelManager;
+    private bool $roundBlockSizeModeExplicitly;
 
     /**
      * QRCodeGenerator constructor
@@ -43,8 +44,11 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         private readonly ColorManager    $colorManager = new ColorManager(),
         private readonly WriterManager   $writerManager = new WriterManager(),
         private readonly OutputManager   $outputManager = new OutputManager(),
-        private readonly EncodingManager $encodingManager = new EncodingManager()
-    ){
+        private readonly EncodingManager $encodingManager = new EncodingManager(),
+        private RoundBlockSizeMode $roundBlockSizeMode = RoundBlockSizeMode::Margin,
+        private ErrorCorrectionLevel $errorCorrectionLevel = ErrorCorrectionLevel::High
+    )
+    {
         $this->labelManager = new LabelManager($this->colorManager);
     }
 
@@ -82,11 +86,12 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
             writer: $this->validateWriter($format, $customs),
             writerOptions: [],
             validateResult: false,
-            data: $this->data,
+            data: $this->getData(),
             encoding: $this->encodingManager->getEncoding(),
-            errorCorrectionLevel: ErrorCorrectionLevel::High,
-            size: $this->size,
-            margin: $this->margin,
+            errorCorrectionLevel: $this->getErrorCorrectionLevel(),
+            size: $this->getSize(),
+            margin: $this->getMargin(),
+            roundBlockSizeMode: $this->getBlockSizeMode(),
             foregroundColor: $this->colorManager->getColor(),
             backgroundColor: $this->colorManager->getBackgroundColor(),
             labelText: $this->labelManager->getLabel(),
@@ -190,7 +195,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Retrieves the data value
+     * Get the data value
      *
      * @return string|null The data if available, null otherwise
      */
@@ -217,7 +222,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Retrieves the size value
+     * Get the size value
      *
      * @return int The size value
      */
@@ -244,13 +249,103 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Retrieves the margin value
+     * Get the margin value
      *
      * @return int The margin value
      */
     public function getMargin(): int
     {
         return $this->margin;
+    }
+
+    /**
+     * Set the round block size mode
+     *
+     * The string can be either:
+     * - The enum case name (e.g. "None", "Margin", "Enlarge", "Shrink") — case-insensitive.
+     *
+     * @param string $mode The round block size mode as a string.
+     * @return self
+     * @throws \InvalidArgumentException If the given mode is invalid.
+     */
+    public function setBlockSizeMode(string $mode): self
+    {
+        $mode = strtolower($mode);
+
+        $validModes = array_merge(
+            array_map('strtolower', array_column(RoundBlockSizeMode::cases(), 'name')),
+            array_map('strtolower', array_column(RoundBlockSizeMode::cases(), 'value'))
+        );
+
+        if (!in_array($mode, $validModes, true)) {
+            throw new \InvalidArgumentException(
+                'Invalid round block size mode. Accepted values: ' . implode(', ', array_unique($validModes)) . '.'
+            );
+        }
+
+        foreach (RoundBlockSizeMode::cases() as $case) {
+            if (strtolower($case->name) === $mode || strtolower($case->value) === $mode) {
+                $this->roundBlockSizeMode = $case;
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the current round block size mode of the QR code.
+     *
+     * @return RoundBlockSizeMode The current block size mode enum instance.
+     */
+    public function getBlockSizeMode(): RoundBlockSizeMode
+    {
+        return $this->roundBlockSizeMode;
+    }
+
+    /**
+     * Set the error correction level for the QR code
+     *
+     * The string can be either:
+     * - The enum case name (e.g. "Low", "Medium", "Quartile", "High") — case-insensitive.
+     *
+     * @param string $level The error correction level as a string.
+     * @return self
+     * @throws \InvalidArgumentException If the given level is invalid. Accepted values: low, medium, quartile, high.
+     */
+    public function setErrorCorrectionLevel(string $level): self
+    {
+        $level = strtolower($level);
+
+        $validLevels = array_merge(
+            array_map('strtolower', array_column(ErrorCorrectionLevel::cases(), 'name')),
+            array_map('strtolower', array_column(ErrorCorrectionLevel::cases(), 'value'))
+        );
+
+        if (!in_array($level, $validLevels, true)) {
+            throw new \InvalidArgumentException(
+                'Invalid error correction level. Accepted values: ' . implode(', ', array_unique($validLevels)) . '.'
+            );
+        }
+
+        foreach (ErrorCorrectionLevel::cases() as $case) {
+            if (strtolower($case->name) === $level || strtolower($case->value) === $level) {
+                $this->errorCorrectionLevel = $case;
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the current error correction level of the QR code
+     *
+     * @return ErrorCorrectionLevel The current error correction level enum instance.
+     */
+    public function getErrorCorrectionLevel(): ErrorCorrectionLevel
+    {
+        return $this->errorCorrectionLevel;
     }
 
     /**
@@ -267,7 +362,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Retrieves the color from the color manager
+     * Get the color from the color manager
      *
      * @return ColorInterface The color object
      */
@@ -290,7 +385,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Retrieves the background color from the color manager
+     * Get the background color from the color manager
      *
      * @return ColorInterface The background color object
      */
@@ -309,9 +404,9 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      */
     public function setLogo(string $logoPath, int $logoSize = 80): self
     {
-//        if (!file_exists($logoPath)) {
-//            throw new \InvalidArgumentException('Logo File Does Not Exist');
-//        }
+        if (!file_exists($logoPath)) {
+            throw new \InvalidArgumentException('Logo File Does Not Exist');
+        }
 
         $this->logoManager->setLogo($logoPath);
         $this->logoManager->setLogoSize($logoSize);
@@ -319,7 +414,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Retrieves the logo path from the logo manager
+     * Get the logo path from the logo manager
      *
      * @return string|null The logo path if available, null otherwise
      */
@@ -345,7 +440,8 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
         string $textColor = '#000000',
         int    $fontSize = 50,
         array  $margin = [0, 10, 10, 10]
-    ): self{
+    ): self
+    {
         if (empty($label)) {
             throw new \InvalidArgumentException('Label cannot be empty');
         }
@@ -360,7 +456,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     }
 
     /**
-     * Retrieves the label from the label manager
+     * Get the label from the label manager
      *
      * @return string|null The label if available, null otherwise
      */
@@ -374,6 +470,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
      *
      * @param string $encoding The encoding type ('UTF-16' ,'UTF-8', 'ASCII', 'ISO-8859-1', 'ISO-8859-5', 'ISO-8859-15') and more...
      * @return self Returns the current instance for method chaining
+     * @throws \Exception
      */
     public function setEncoding(string $encoding): self
     {

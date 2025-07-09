@@ -97,6 +97,24 @@ interface QRCodeGeneratorInterface
     public function setMargin(int $margin): self;
 
     /**
+     * Set the round block size mode
+     *
+     * @param string $mode The round block size mode as a string.
+     * @return self
+     * @throws \InvalidArgumentException If the given mode is invalid.
+     */
+    public function setBlockSizeMode(string $mode): self;
+
+    /**
+     * Set the error correction level for the QR code
+     *
+     * @param string $level The error correction level as a string.
+     * @return self
+     * @throws \InvalidArgumentException If the given level is invalid.
+     */
+    public function setErrorCorrectionLevel(string $level): self;
+
+    /**
      * Set the color of the QR code foreground
      *
      * @param string $hexColor The hexadecimal color code
