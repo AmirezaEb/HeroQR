@@ -38,7 +38,7 @@ class QRCodeGenerator implements QrCodeGeneratorInterface
     public function __construct(
         private int                      $size = 800,
         private int                      $margin = 10,
-        private string                   $data = '',
+        private string                   $data = 'https://github.com/AmirezaEb/HeroQR',
         private readonly string          $outputFormat = 'getDataUri',
         private readonly LogoManager     $logoManager = new LogoManager(),
         private readonly ColorManager    $colorManager = new ColorManager(),

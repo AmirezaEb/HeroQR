@@ -29,10 +29,11 @@ final class Drawer
      *
      * @param \GdImage $baseImage The base image for drawing the QR code.
      * @param MatrixInterface $matrix The QR code matrix.
-     * @param int $baseBlockSize The block size for the QR code.
+     * @param int $baseBlockSize The pixel size of each QR matrix block.
      * @param int $foregroundColor The color of the QR code blocks.
      * @param QrCodeInterface $qrCode The QR code object.
      * @param string $blockShape The shape of the QR code blocks.
+     * @param ?LogoInterface $logo The logo to embed in the QR code (optional)
      * @param ImageOverlay $imageOverlay Optional image overlay.
      * @return void
      * @throws \Exception
@@ -44,12 +45,13 @@ final class Drawer
         int             $foregroundColor,
         QrCodeInterface $qrCode,
         string          $blockShape,
+        ?LogoInterface  $logo,
         ImageOverlay    $imageOverlay
     ): void
     {
         $cornerImage = self::prepareCornerImage($qrCode, $imageOverlay);
         $resizedCorner = self::resizeCornerImage($cornerImage, $baseBlockSize);
-        self::drawMatrix($baseImage, $matrix, $baseBlockSize, $foregroundColor, $resizedCorner, $blockShape, null, $qrCode->getData());
+        self::drawMatrix($baseImage, $matrix, $baseBlockSize, $foregroundColor, $resizedCorner, $blockShape, $qrCode->getData(), $logo);
 
         imagedestroy($cornerImage);
         imagedestroy($resizedCorner);
@@ -60,12 +62,12 @@ final class Drawer
      *
      * @param \GdImage $baseImage The base image for the QR code.
      * @param MatrixInterface $matrix The QR code matrix.
-     * @param int $baseBlockSize The size of each block in the QR code.
+     * @param int $baseBlockSize The pixel size of each QR matrix block.
      * @param int $foregroundColor The fill color for the blocks.
      * @param \GdImage $resizedCorner Resized corner image for rounded blocks.
      * @param string $blockShape The shape of the block in the QR code
      * @param LogoInterface|null $logo The logo to embed in the QR code (optional).
-     * @param string|null $data The data encoded in the QR code (optional).
+     * @param string $data The data encoded in the QR code (optional).
      * @return void
      */
     public static function drawMatrix(
@@ -75,12 +77,12 @@ final class Drawer
         int             $foregroundColor,
         \GdImage        $resizedCorner,
         string          $blockShape,
+        string          $data,
         ?LogoInterface  $logo = null,
-        ?string         $data = null
     ): void
     {
         $blockCount = $matrix->getBlockCount();
-        [$logoWidth, $logoHeight, $padding] = self::prepareLogoDimensions($logo, $data, $baseBlockSize);
+        [$logoWidth, $logoHeight, $padding] = self::prepareLogoDimensions($logo, $data, $blockCount, $baseBlockSize);
 
         [$logoStartRow, $logoEndRow, $logoStartCol, $logoEndCol] = self::calculateLogoBounds([
             'blockCount' => $blockCount,
@@ -112,14 +114,14 @@ final class Drawer
     /**
      * Draws a block of the matrix on the QR code image, handling special corner blocks and filling others with a foreground color
      *
-     * @param \GdImage $baseImage The base image where the block will be drawn
-     * @param MatrixInterface $matrix The matrix representing the QR code
-     * @param int $rowIndex The row index of the block
-     * @param int $columnIndex The column index of the block
-     * @param int $baseBlockSize The size of each block in the QR code
-     * @param int $foregroundColor The color to fill the block
-     * @param string $blockShape The shape of the block in the QR code
-     * @param \GdImage $resizedCorner The resized corner image (used for corner blocks)
+     * @param \GdImage $baseImage The base image where the block will be drawn.
+     * @param MatrixInterface $matrix The matrix representing the QR code.
+     * @param int $rowIndex The row index of the block.
+     * @param int $columnIndex The column index of the block.
+     * @param int $baseBlockSize The pixel size of each QR matrix block.
+     * @param int $foregroundColor The color to fill the block.
+     * @param string $blockShape The shape of the block in the QR code.
+     * @param \GdImage $resizedCorner The resized corner image (used for corner blocks).
      * @return void
      */
     private static function drawMatrixBlock(
@@ -147,15 +149,15 @@ final class Drawer
     /**
      * Draws a corner block on the QR code image (top-left, top-right, or bottom-left)
      *
-     * @param \GdImage $baseImage The base image where the corner block will be drawn
-     * @param MatrixInterface $matrix The matrix representing the QR code
-     * @param int $rowIndex The row index of the block
-     * @param int $columnIndex The column index of the block
-     * @param int $baseBlockSize The size of each block in the QR code
-     * @param \GdImage $resizedCorner The resized corner image
-     * @param bool $isTopLeft Whether the corner is top-left
-     * @param bool $isTopRight Whether the corner is top-right
-     * @param bool $isBottomLeft Whether the corner is bottom-left
+     * @param \GdImage $baseImage The base image where the corner block will be drawn.
+     * @param MatrixInterface $matrix The matrix representing the QR code.
+     * @param int $rowIndex The row index of the block.
+     * @param int $columnIndex The column index of the block.
+     * @param int $baseBlockSize The pixel size of each QR matrix block.
+     * @param \GdImage $resizedCorner The resized corner image.
+     * @param bool $isTopLeft Whether the corner is top-left.
+     * @param bool $isTopRight Whether the corner is top-right.
+     * @param bool $isBottomLeft Whether the corner is bottom-left.
      * @return void
      */
     private static function drawCornerBlock(
@@ -199,7 +201,14 @@ final class Drawer
      * @param int $columnIndex The current column index in the matrix.
      * @return bool True if the corner image needs to be rotated, false otherwise.
      */
-    private static function rotateCornerImage(int $rowIndex, MatrixInterface $matrix, bool $isTopLeft, bool $isTopRight, bool $isBottomLeft, int $columnIndex): bool
+    private static function rotateCornerImage(
+        int             $rowIndex,
+        MatrixInterface $matrix,
+        bool            $isTopLeft,
+        bool            $isTopRight,
+        bool            $isBottomLeft,
+        int             $columnIndex
+    ): bool
     {
         return ($isTopLeft && $rowIndex === 0 && $columnIndex === 0) ||
             ($isTopRight && $rowIndex === 0 && $columnIndex === $matrix->getBlockCount() - self::FINDER_PATTERN_SIZE) ||
@@ -240,28 +249,32 @@ final class Drawer
      * Prepares the logo dimensions and calculates the necessary padding based on the data length.
      *
      * @param LogoInterface|null $logo The logo to be used in the QR code.
-     * @param string|null $data The data for the QR code.
-     * @param int $baseBlockSize The base size of the QR code blocks.
+     * @param string $data The data encoded in the QR code.
+     * @param int $blockCount The number of blocks per QR matrix side.
+     * @param int $baseBlockSize The pixel size of each QR matrix block.
      * @return array The width, height, and padding for the logo.
      */
-    private static function prepareLogoDimensions(?LogoInterface $logo, ?string $data, int $baseBlockSize): array
+    private static function prepareLogoDimensions(
+        ?LogoInterface $logo,
+        string         $data,
+        int            $blockCount,
+        int            $baseBlockSize
+    ): array
     {
         if ($logo === null) {
             return [0, 0, 0];
         }
 
-        $length = strlen($data ?? '');
         [$logoWidth, $logoHeight] = self::calculateLogoDimensions($logo, $baseBlockSize);
 
-        $padding = match (true) {
-            $length >= 380 => 7,
-            $length >= 260 => 6,
-            $length >= 150 => 5,
-            $length >= 80 => 4,
-            $length >= 25 => 3,
-            $length >= 10 => 2,
-            default => 1,
-        };
+        $logoRatio = ($logoWidth * $logoHeight) / ($blockCount * $blockCount);
+
+        $length = strlen($data ?? '');
+
+        $padding = max(
+            2,
+            (int)ceil($blockCount * 0.045 + $logoRatio * $blockCount * 0.7 + log10($length ?: 1))
+        );
 
         return [$logoWidth, $logoHeight, $padding];
     }
@@ -272,7 +285,9 @@ final class Drawer
      * @param array $logo Contains logo dimensions, block count, and padding information.
      * @return array The start and end row and column indices for logo placement.
      */
-    private static function calculateLogoBounds(array $logo): array
+    private static function calculateLogoBounds(
+        array $logo
+    ): array
     {
         $logoStartRow = max(0, ($logo['blockCount'] - $logo['height']) / 2 - $logo['padding']);
         $logoEndRow = min($logo['blockCount'], ($logo['blockCount'] + $logo['height']) / 2 + $logo['padding']);
@@ -288,20 +303,25 @@ final class Drawer
      * @param array $columns Contains row and column indices, and logo bounds.
      * @return bool True if the position is within the logo bounds, false otherwise.
      */
-    private static function isWithinLogoBounds(array $columns): bool
+    private static function isWithinLogoBounds(
+        array $columns
+    ): bool
     {
         return $columns['rowIndex'] >= $columns['logoStartRow'] && $columns['rowIndex'] < $columns['logoEndRow'] &&
-            $columns['rowIndex'] >= $columns['logoStartCol'] && $columns['rowIndex'] < $columns['logoEndCol'];
+            $columns['columnIndex'] >= $columns['logoStartCol'] && $columns['columnIndex'] < $columns['logoEndCol'];
     }
 
     /**
      * Calculates the dimensions of the logo based on the base block size.
      *
      * @param LogoInterface|null $logo The logo to be resized.
-     * @param int $baseBlockSize The base size of QR code blocks.
+     * @param int $baseBlockSize The pixel size of each QR matrix block.
      * @return array The resized width and height of the logo in blocks.
      */
-    private static function calculateLogoDimensions(?LogoInterface $logo, int $baseBlockSize): array
+    private static function calculateLogoDimensions(
+        ?LogoInterface $logo,
+        int            $baseBlockSize
+    ): array
     {
         return $logo === null
             ? [0, 0] : [
@@ -317,7 +337,10 @@ final class Drawer
      * @return \GdImage The prepared corner image
      * @throws \Exception If the corner image cannot be loaded
      */
-    private static function prepareCornerImage(QrCodeInterface $qrCode, ImageOverlay $imageOverlay): \GdImage
+    private static function prepareCornerImage(
+        QrCodeInterface $qrCode,
+        ImageOverlay    $imageOverlay
+    ): \GdImage
     {
         $cornerImage = $imageOverlay->getImage();
 
@@ -334,7 +357,10 @@ final class Drawer
      * @param ColorInterface $color The color to apply to the image
      * @return \GdImage The tinted image
      */
-    private static function tintImage(\GdImage $image, ColorInterface $color): \GdImage
+    private static function tintImage(
+        \GdImage       $image,
+        ColorInterface $color
+    ): \GdImage
     {
         [$width, $height] = [imagesx($image), imagesy($image)];
 
@@ -369,10 +395,13 @@ final class Drawer
      * Resizes the corner image to fit the QR code matrix
      *
      * @param \GdImage $cornerImage The original corner image
-     * @param int $baseBlockSize The size of the base blocks in the QR code
-     * @return \GdImage The resized corner image
+     * @param int $baseBlockSize The pixel size of each QR matrix block.
+     * @return \GdImage The resized corner image for the QR code.
      */
-    private static function resizeCornerImage(\GdImage $cornerImage, int $baseBlockSize): \GdImage
+    private static function resizeCornerImage(
+        \GdImage $cornerImage,
+        int      $baseBlockSize
+    ): \GdImage
     {
         $cornerSize = self::FINDER_PATTERN_SIZE * $baseBlockSize;
         $resizedCorner = imagecreatetruecolor($cornerSize, $cornerSize);

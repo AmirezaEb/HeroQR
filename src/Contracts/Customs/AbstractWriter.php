@@ -8,7 +8,7 @@ use Endroid\QrCode\{QrCodeInterface, RoundBlockSizeMode};
 use Endroid\QrCode\{Logo\LogoInterface, Matrix\MatrixInterface};
 use Endroid\QrCode\ImageData\{LabelImageData, LogoImageData};
 use Endroid\QrCode\Label\{LabelAlignment, LabelInterface};
-use Endroid\QrCode\Writer\{WriterInterface, AbstractGdWriter};
+use Endroid\QrCode\Writer\{AbstractGdWriter, WriterInterface};
 use Endroid\QrCode\Writer\Result\{GdResult, ResultInterface};
 use HeroQR\Customs\{ImageOverlay, ShapePaths};
 
@@ -48,7 +48,8 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
         ?LogoInterface  $logo = null,
         ?LabelInterface $label = null,
         array           $options = []
-    ): ResultInterface {
+    ): ResultInterface
+    {
         if (!extension_loaded('gd')) {
             throw new \Exception('Unable to generate image: please check if the GD extension is enabled and configured correctly');
         }
@@ -59,7 +60,7 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
         $baseImage = $this->createBaseImage($matrix, $baseBlockSize);
         $foregroundColor = $this->allocateForegroundColor($baseImage, $qrCode);
 
-        Drawer::drawQrCode($baseImage, $matrix, $baseBlockSize, $foregroundColor, $qrCode, $this->blockShape, $this->imageOverlay);
+        Drawer::drawQrCode($baseImage, $matrix, $baseBlockSize, $foregroundColor, $qrCode, $this->blockShape, $logo, $this->imageOverlay);
 
         $targetImage = $this->createTargetImage($matrix, $qrCode, $label);
 
@@ -96,7 +97,8 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
     private function createBaseImage(
         MatrixInterface $matrix,
         int             $baseBlockSize
-    ): \GdImage {
+    ): \GdImage
+    {
         $baseImage = imagecreatetruecolor($matrix->getBlockCount() * $baseBlockSize, $matrix->getBlockCount() * $baseBlockSize);
 
         imageantialias($baseImage, true);
@@ -120,7 +122,8 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
     private function allocateForegroundColor(
         \GdImage        $baseImage,
         QrCodeInterface $qrCode
-    ): int {
+    ): int
+    {
         return imagecolorallocatealpha(
             $baseImage,
             $qrCode->getForegroundColor()->getRed(),
@@ -144,7 +147,8 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
         MatrixInterface $matrix,
         QrCodeInterface $qrCode,
         ?LabelInterface $label
-    ): \GdImage {
+    ): \GdImage
+    {
         $targetWidth = $matrix->getOuterSize();
         $targetHeight = $matrix->getOuterSize();
 
@@ -185,7 +189,8 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
     private function addLogoToResult(
         LogoInterface $logo,
         GdResult      $result
-    ): GdResult {
+    ): GdResult
+    {
         $logoImageData = LogoImageData::createForLogo($logo);
 
         if ('image/png' !== $logoImageData->getMimeType()) {
@@ -232,7 +237,8 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
     private function addLabelToResult(
         LabelInterface $label,
         GdResult       $result
-    ): GdResult {
+    ): GdResult
+    {
         $targetImage = $result->getImage();
         $labelImageData = LabelImageData::createForLabel($label);
 
