@@ -123,7 +123,7 @@ class LabelManagerTest extends TestCase
 
         $label->setLabelColor('#FF573390');
         $customColor = $label->getLabelColor();
-        $this->assertEquals([255, 87, 51, 144], [$customColor->getRed(), $customColor->getGreen(), $customColor->getBlue(), $customColor->getAlpha()], 'Custom color values do not match expected');
+        $this->assertEquals([255, 87, 51, 72], [$customColor->getRed(), $customColor->getGreen(), $customColor->getBlue(), $customColor->getAlpha()], 'Custom color values do not match expected');
     }
 
     /*** 

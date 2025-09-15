@@ -133,7 +133,7 @@ class ColorManagerTest extends TestCase
         $color = $hex2rgbMethod->invokeArgs($colorManager, ['#FF000080']);
 
         $this->assertNotNull($color, 'Expected a valid color object');
-        $this->assertEquals([255, 0, 0, 128], [$color->getRed(), $color->getGreen(), $color->getBlue(), $color->getAlpha()], 'RGBA values should correctly reflect the hex input #FF000080');
+        $this->assertEquals([255, 0, 0, 64], [$color->getRed(), $color->getGreen(), $color->getBlue(), $color->getAlpha()], 'RGBA values should correctly reflect the hex input #FF000080');
     }
 
     /**

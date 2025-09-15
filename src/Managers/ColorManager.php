@@ -145,9 +145,11 @@ class ColorManager implements ColorManagerInterface
         $b = hexdec(substr($hexColor, 4, 2));
 
         if (strlen($hexColor) === 8) {
-            $a = hexdec(substr($hexColor, 6, 2));
-            $a = max(0, min($a, 255));
-            return new Color($r, $g, $b, $a);
+            $alpha = hexdec(substr($hexColor, 6, 2));
+
+            $alphaGD = (int) round(($alpha / 255) * 127);
+
+            return new Color($r, $g, $b, $alphaGD);
         }
 
         return new Color($r, $g, $b);

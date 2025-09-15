@@ -167,7 +167,7 @@ readonly abstract class AbstractWriter extends AbstractGdWriter implements Write
             $qrCode->getBackgroundColor()->getRed(),
             $qrCode->getBackgroundColor()->getGreen(),
             $qrCode->getBackgroundColor()->getBlue(),
-            (int)round($qrCode->getBackgroundColor()->getAlpha() * 127 / 255)
+            $qrCode->getBackgroundColor()->getAlpha()
         );
 
         imagefill($targetImage, 0, 0, $backgroundColor);
