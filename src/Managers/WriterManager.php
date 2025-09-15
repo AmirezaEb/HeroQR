@@ -26,7 +26,7 @@ class WriterManager extends AbstractWriterManager
         'eps' => 'Endroid\\QrCode\\Writer\\EpsWriter',
         'pdf' => 'Endroid\\QrCode\\Writer\\PdfWriter',
         'binary' => 'Endroid\\QrCode\\Writer\\BinaryWriter',
-        'webp' => 'Endroid\\QrCode\\Writer\\WebpWriter',
+        'webp' => 'Endroid\\QrCode\\Writer\\WebPWriter',
         'gif' => 'Endroid\\QrCode\\Writer\\GifWriter'
     ];
 
