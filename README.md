@@ -1,16 +1,13 @@
 # HeroQR - A Powerful PHP QR Code Library
 
-**Last Updated:** February 2026   
-**Author:** Amirreza Ebrahimi   
-**Contributors:** None yet   
-**License:** MIT License
+<p align="center">
+    <a href="https://php.net"><img alt="PHP 8.2" src="https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php"></a>
+</p>
 
-- HeroQR is an advanced and modular PHP library designed to simplify the creation, customization, and management of QR codes. Whether you need a basic QR code or a highly customized one with embedded logos, colors, markers, and cursors, HeroQR has you covered. You can fully customize the appearance of your QR code by adjusting the markers (for corner customization), cursors (for design enhancements), and even the shapes of the QR code itself. This level of customization allows you to tailor your QR codes to fit your needs precisely.
 
 > [!TIP]
-> **Try the Beta!** We are currently testing **v1.2.0-beta** which introduces highly requested features like **SVG Custom Styling** (Shapes, Markers, and Cursors).
-> If you want to experiment with these new features and provide feedback, check out the [Beta Documentation](https://github.com/amirezaeb/heroqr/tree/develop) or install it via:
-> `composer require amirezaeb/heroqr:1.2.0-beta`
+> Packages in the same major version series are compatible.
+> See the migration guide for breaking changes between versions.
 
 ## Table of Contents
 
@@ -22,7 +19,6 @@
         - [3. Advanced Customization](#3-advanced-customization)
         - [4. Customizing Shapes Markers and Cursors (PNG Only)](#4-customizing-shapes-markers-and-cursors-png-only)
         - [5. Advanced Output Options](#5-advanced-output-options)
-    - [Project Structure](#project-structure)
     - [Contributing](#contributing)
     - [License](#license)
     - [Contact](#contact)
@@ -67,7 +63,7 @@ Use [Composer](https://getcomposer.org/) to install the library. Also make sure 
 [GD extension](https://www.php.net/manual/en/book.image.php) if you want to generate images.
 
 ```bash
-composer require amirezaeb/heroqr
+composer require amirezaeb/heroqr:^1.0
 ```
 
 ### 2. Basic Usage
@@ -190,19 +186,6 @@ $qrCode = $qrCodeManager
 $qrCode->saveTo('custom-qr');
 ```
 
-**Example QR Code Outputs with Different Combinations :** Below are some examples of QR codes generated using various combinations of shapes, markers, and cursors:
-
-| Combination  | Shape            | Marker             | Cursor             | Preview                                                                                              |
-|--------------|------------------|--------------------|--------------------|------------------------------------------------------------------------------------------------------|
-| **S1-M1-C1** | Square (Default) | Square (Default)   | Square (Default)   | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S1-M1-C1.png) |
-| **S2-M2-C2** | Circle (Custom)  | Circle (Custom)    | Circle (Custom)    | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S2-M2-C2.png) |
-| **S3-M3-C3** | Star (Custom)    | D-Drop-O (Custom)  | D-Drop-O (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S3-M3-C3.png) |
-| **S4-M4-C4** | Diamond (Custom) | D-Drop-I (Custom)  | D-Drop-I (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M4-C4.png) |
-| **S4-M5-C5** | Diamond (Custom) | D-Drop-IO (Custom) | D-Drop-IO (Custom) | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M5-C5.png) |
-| **S4-M6-C6** | Diamond (Custom) | Square-O (Custom)  | Square-O (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M6-C6.png) |
-
-- **Experiment with Different Combinations:** In this section, you can experiment with various combinations of shapes, markers, and cursors to create unique QR codes that best suit your needs. Each combination will impact the appearance of the QR code, from the corners and points to the positioning of the markers. Simply adjust the parameters to customize your QR codes.
-
 ### 5. Advanced Output Options
 
 HeroQR provides advanced output capabilities, offering flexibility and compatibility for various use cases, from web embedding to raw data manipulation:
@@ -249,22 +232,6 @@ $dataUri = $qrCode->getDataUri();
 $qrCode->saveTo('qr_code_output');
 
 ```
-
-## Project Structure
-
-The modular structure of HeroQR is designed to enhance efficiency and scalability, making it easier to use, maintain, and expand:
-
-- **Contracts :** Defines interfaces for the core components, ensuring consistency and reusability across the system.
-
-- **Core :** Houses the primary logic for generating and managing QR codes, acting as the foundation of the library.
-
-- **DataTypes :** Provides definitions and automatic validation for various data types (WiFi, Location, URL, Email, Phone, Text). This eliminates the need for users to manually validate their input.
-
-- **Managers :** Oversees the customization and processing of QR codes, enabling users to have full control over the appearance and functionality of their QR codes.
-
-- **Customs :** The Customs module allows advanced QR code customization, including shapes, cursors, markers, line colors, and other visual elements, perfect for creating unique and tailored designs.
-
-- **Tests :** Contains unit and integration tests for the library's core functionality. These tests ensure the library works as expected, providing confidence in the stability and correctness of the code.
 
 ## Contributing
 
