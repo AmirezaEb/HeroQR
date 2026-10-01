@@ -18,6 +18,7 @@ class CursorPaths extends AbstractCustomPaths
     public const C4 = __DIR__ . '/../../assets/Cursors/Cursor-4.png';
     public const C5 = __DIR__ . '/../../assets/Cursors/Cursor-5.png';
     public const C6 = __DIR__ . '/../../assets/Cursors/Cursor-6.png';
+    public const C7 = __DIR__ . '/../../assets/Cursors/Cursor-7.png';
 
 
     /**

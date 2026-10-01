@@ -39,8 +39,8 @@
     - `C` for Cursor type.
     - Available marker and cursor types:
         - **Shapes:** `S1` - `S2` - `S3` - `S4`
-        - **Markers:** `M1` - `M2` - `M3` - `M4` - `M5` - `M6`
-        - **Cursors:** `C1` - `C2` - `C3` - `C4` - `C5` - `C6`
+        - **Markers:** `M1` - `M2` - `M3` - `M4` - `M5` - `M6` - `M7`
+        - **Cursors:** `C1` - `C2` - `C3` - `C4` - `C5` - `C6` - `C7`
     - **Note:** This feature is available only for PNG format at the moment, but additional formats will be supported in future updates.
 
 - **Multi-Format Data Encoding:**  
@@ -155,8 +155,8 @@ HeroQR allows you to fully customize the markers, cursors, and shapes of your QR
 #### Available Options:
 
 - **Shapes**: `S1` - `S2` - `S3` - `S4`
-- **Markers**: `M1` - `M2` - `M3` - `M4` - `M5` - `M6`
-- **Cursors**: `C1` - `C2` - `C3` - `C4` - `C5` - `C6`
+- **Markers**: `M1` - `M2` - `M3` - `M4` - `M5` - `M6` - `M7`
+- **Cursors**: `C1` - `C2` - `C3` - `C4` - `C5` - `C6` - `C7`
 
 These options allow you to modify the appearance of the QR code, making it more personalized or stylish. Shapes modify the corners, markers change the patterns on the dots, and cursors adjust the positioning pointers.
 
