@@ -8,8 +8,8 @@
     <a href="https://github.com/AmirezaEb/HeroQR/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/packagist/l/amirezaeb/heroqr?style=for-the-badge&color=orange"></a>
 </p>
 
-HeroQR is a PHP library for generating and customizing QR codes with full control over styling and multi-format output, while remaining ISO/IEC 18004 compliant.
-
+A powerful PHP QR Code library with advanced customization,
+multi-format export, and modern QR styling.
 ## Table of Contents
 
 - [Features](#features)
@@ -123,8 +123,8 @@ HeroQR supports custom styling for QR modules, corner markers, and alignment cur
 
 #### Available Options:
 - **Shapes (Modules):** `S1` to `S4`
-- **Markers (Corners):** `M1` to `M6`
-- **Cursors (Inner Markers):** `C1` to `C6`
+- **Markers (Corners):** `M1` to `M7`
+- **Cursors (Inner Markers):** `C1` to `C7`
 
 #### Example:
 
@@ -147,14 +147,15 @@ $qrCode->saveTo('custom-qr');
 
 **Examples**
 
-|  Combination   | Shape (Body)     | Marker (Corner)    | Cursor (Inner)     |                                                Preview                                                 |
-|:--------------:|------------------|--------------------|--------------------|:------------------------------------------------------------------------------------------------------:|
-|  **S1-M1-C1**  | Square (Default) | Square (Default)   | Square (Default)   |  [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S1-M1-C1.png)  |
-|  **S2-M2-C2**  | Circle (Custom)  | Circle (Custom)    | Circle (Custom)    |  [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S2-M2-C2.png)  |
-|  **S3-M3-C3**  | Star (Custom)    | D-Drop-O (Custom)  | D-Drop-O (Custom)  |  [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S3-M3-C3.png)  |
-|  **S4-M4-C4**  | Diamond (Custom) | D-Drop-I (Custom)  | D-Drop-I (Custom)  |  [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M4-C4.png)  |
-|  **S4-M5-C5**  | Diamond (Custom) | D-Drop-IO (Custom) | D-Drop-IO (Custom) |  [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M5-C5.png)  |
-|  **S4-M6-C6**  | Diamond (Custom) | Square-O (Custom)  | Square-O (Custom)  |  [View](https://raw.githubusercontent.com/AmirezaEb/AmirezaEb/main/assets/img/QrCode/Qr-S4-M6-C6.png)  |
+| Combination  | Shape (Body)     | Marker (Corner)    | Cursor (Inner)     |                                             Preview                                              |
+|:------------:|------------------|--------------------|--------------------|:------------------------------------------------------------------------------------------------:|
+| **S1-M1-C1** | Square (Default) | Square (Default)   | Square (Default)   | [View](https://raw.githubusercontent.com/AmirezaEb/HeroQR/main/.github/examples/Qr-S1-M1-C1.png) |
+| **S2-M2-C2** | Circle (Custom)  | Circle (Custom)    | Circle (Custom)    | [View](https://raw.githubusercontent.com/AmirezaEb/HeroQR/main/.github/examples/Qr-S2-M2-C2.png) |
+| **S3-M3-C3** | Star (Custom)    | D-Drop-O (Custom)  | D-Drop-O (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/HeroQR/main/.github/examples/Qr-S3-M3-C3.png) |
+| **S4-M4-C4** | Diamond (Custom) | D-Drop-I (Custom)  | D-Drop-I (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/HeroQR/main/.github/examples/Qr-S4-M4-C4.png) |
+| **S4-M5-C5** | Diamond (Custom) | D-Drop-IO (Custom) | D-Drop-IO (Custom) | [View](https://raw.githubusercontent.com/AmirezaEb/HeroQR/main/.github/examples/Qr-S4-M5-C5.png) |
+| **S4-M6-C6** | Diamond (Custom) | Square-O (Custom)  | Square-O (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/HeroQR/main/.github/examples/Qr-S4-M6-C6.png) |
+| **S1-M7-C7** | Square (Default) | Square-V (Custom)  | Square-V (Custom)  | [View](https://raw.githubusercontent.com/AmirezaEb/HeroQR/main/.github/examples/Qr-S1-M7-C7.png) |
 
 ### 5. Advanced Output Options
 
@@ -230,7 +231,9 @@ UQBejif4zPS57KWzz9VcqNHgRqLiOs72--xcoMyLkbnvyvn2
 
 **USDT (TRC-20)**
 
-~~TEbQ2K3kWF1TjE4yRuqp6hTH8FRr7n7xGX~~
+```text
+TQhs6gNF1xZZPfk7hdHccKEYTEwBR65KkW
+```
 
 Organizations interested in sponsoring HeroQR or featuring their brand in the documentation may contact us via the [Contact section](#contact).
 

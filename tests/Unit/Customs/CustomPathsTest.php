@@ -19,7 +19,7 @@ class CustomPathsTest extends TestCase
     {
         $paths = CursorPaths::getAllPaths();
 
-        $this->assertCount(6, $paths, "CursorPaths should have 6 constants starting with 'C'.");
+        $this->assertCount(7, $paths, "CursorPaths should have 7 constants starting with 'C'.");
 
         foreach ($paths as $path) {
             $this->assertFileExists($path, "Cursor asset file not found at: $path");
@@ -35,7 +35,7 @@ class CustomPathsTest extends TestCase
     {
         $paths = MarkerPaths::getAllPaths();
 
-        $this->assertCount(6, $paths, "MarkerPaths should have 6 constants starting with 'M'.");
+        $this->assertCount(7, $paths, "MarkerPaths should have 7 constants starting with 'M'.");
 
         foreach ($paths as $path) {
             $this->assertFileExists($path, "Marker asset file not found at: $path");

@@ -18,6 +18,7 @@ class MarkerPaths extends AbstractCustomPaths
     public const M4 = __DIR__ . '/../../assets/Markers/Marker-4.png';
     public const M5 = __DIR__ . '/../../assets/Markers/Marker-5.png';
     public const M6 = __DIR__ . '/../../assets/Markers/Marker-6.png';
+    public const M7 = __DIR__ . '/../../assets/Markers/Marker-7.png';
 
     /**
      * Retrieves all marker paths as an associative array
