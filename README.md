@@ -1,6 +1,9 @@
 # HeroQR - A Powerful PHP QR Code Library
 
 <p align="center">
+    <a href="https://github.com/AmirezaEb/HeroQR/actions/workflows/CI.yml?query=branch%3A1.x"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/AmirezaEb/HeroQR/CI.yml?branch=1.x&style=for-the-badge&label=Tests&logo=github"></a>
+    <a href="https://github.com/AmirezaEb/HeroQR/actions/workflows/CI.yml"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/AmirezaEb/HeroQR/CI.yml?style=for-the-badge&label=Tests&logo=github"></a>
+    <a href="https://packagist.org/packages/amirezaeb/heroqr"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/amirezaeb/heroqr?style=for-the-badge&color=blue"></a>
     <a href="https://php.net"><img alt="PHP 8.2" src="https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php"></a>
 </p>
 
@@ -63,7 +66,7 @@ Use [Composer](https://getcomposer.org/) to install the library. Also make sure 
 [GD extension](https://www.php.net/manual/en/book.image.php) if you want to generate images.
 
 ```bash
-composer require amirezaeb/heroqr:^1.0
+composer require amirezaeb/heroqr:"1.*"
 ```
 
 ### 2. Basic Usage

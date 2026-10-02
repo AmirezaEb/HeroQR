@@ -2,20 +2,21 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [1.x]
   pull_request:
-    branches: [ main, develop ]
+    branches: [1.x]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         php: [8.2, 8.3]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
