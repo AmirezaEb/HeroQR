@@ -5,12 +5,20 @@ namespace HeroQR\Customs\ShapeDrawers;
 use Endroid\QrCode\Color\ColorInterface;
 
 /**
- * Provides static methods to define and draw QR code shapes as SVG elements using <use>
+ * Provides static methods for drawing basic QR code shapes
+ * as reusable SVG elements.
  */
 class SvgShapeDrawer
 {
     /**
-     * Draws a star shape on the image
+     * Draws a star shape
+     *
+     * @param \SimpleXMLElement $baseImage
+     * @param int $rowIndex
+     * @param int $colIndex
+     * @param int $baseBlockSize
+     * @param \Endroid\QrCode\Color\ColorInterface $foregroundColor
+     * @return void
      */
     public static function drawStar(
         \SimpleXMLElement $baseImage,
@@ -18,28 +26,36 @@ class SvgShapeDrawer
         int               $colIndex,
         int               $baseBlockSize,
         ColorInterface    $foregroundColor
-    ): void
-    {
+    ): void {
         self::render($baseImage, __FUNCTION__, function ($defs, $blockSize) {
             $points = [];
 
-            for ($i = 0; $i < 10; $i++) {
+            $outerRadius = $blockSize / 2;
+            $innerRadius = $blockSize / 4;
+
+            for ($i = 0; $i < 10; ++$i) {
                 $angle = ($i * M_PI / 5) + (M_PI / 2);
-                $radius = ($i % 2 === 0) ? $blockSize / 2 : $blockSize / 4;
-                $x = $radius * cos($angle);
-                $y = -($radius * sin($angle));
-                $points[] = round($x, 2) . ',' . round($y, 2);
+                $radius = ($i % 2 === 0) ? $outerRadius : $innerRadius;
+                $points[] = round($radius * cos($angle), 2) . ',' . round(-$radius * sin($angle), 2);
             }
 
             $star = $defs->addChild('polygon');
             $star->addAttribute('points', implode(' ', $points));
+
             return $star;
 
         }, $rowIndex, $colIndex, $baseBlockSize, $foregroundColor);
     }
 
     /**
-     * Draws a square shape on the image
+     * Draws a square shape
+     *
+     * @param \SimpleXMLElement $baseImage
+     * @param int $rowIndex
+     * @param int $colIndex
+     * @param int $baseBlockSize
+     * @param \Endroid\QrCode\Color\ColorInterface $foregroundColor
+     * @return void
      */
     public static function drawSquare(
         \SimpleXMLElement $baseImage,
@@ -47,13 +63,13 @@ class SvgShapeDrawer
         int               $colIndex,
         int               $baseBlockSize,
         ColorInterface    $foregroundColor
-    ): void
-    {
-        self::render($baseImage, __FUNCTION__, function ($defs, $blockSize) {
+    ): void {
 
+        self::render($baseImage, __FUNCTION__, function ($defs, $blockSize) {
+            $halfSize = $blockSize / 2;
             $square = $defs->addChild('rect');
-            $square->addAttribute('x', (string)-($blockSize / 2));
-            $square->addAttribute('y', (string)-($blockSize / 2));
+            $square->addAttribute('x', (string)-$halfSize);
+            $square->addAttribute('y', (string)-$halfSize);
             $square->addAttribute('width', (string)$blockSize);
             $square->addAttribute('height', (string)$blockSize);
 
@@ -63,7 +79,14 @@ class SvgShapeDrawer
     }
 
     /**
-     * Draws a circle shape on the image
+     * Draws a circle shape
+     *
+     * @param \SimpleXMLElement $baseImage
+     * @param int $rowIndex
+     * @param int $colIndex
+     * @param int $baseBlockSize
+     * @param \Endroid\QrCode\Color\ColorInterface $foregroundColor
+     * @return void
      */
     public static function drawCircle(
         \SimpleXMLElement $baseImage,
@@ -71,10 +94,8 @@ class SvgShapeDrawer
         int               $colIndex,
         int               $baseBlockSize,
         ColorInterface    $foregroundColor
-    ): void
-    {
+    ): void {
         self::render($baseImage, __FUNCTION__, function ($defs, $blockSize) {
-
             $circle = $defs->addChild('circle');
             $circle->addAttribute('cx', '0');
             $circle->addAttribute('cy', '0');
@@ -86,7 +107,14 @@ class SvgShapeDrawer
     }
 
     /**
-     * Draws a diamond shape on the image
+     * Draws a diamond shape
+     *
+     * @param \SimpleXMLElement $baseImage
+     * @param int $rowIndex
+     * @param int $colIndex
+     * @param int $baseBlockSize
+     * @param \Endroid\QrCode\Color\ColorInterface $foregroundColor
+     * @return void
      */
     public static function drawDiamond(
         \SimpleXMLElement $baseImage,
@@ -94,19 +122,28 @@ class SvgShapeDrawer
         int               $colIndex,
         int               $baseBlockSize,
         ColorInterface    $foregroundColor
-    ): void
-    {
+    ): void {
         self::render($baseImage, __FUNCTION__, function ($defs, $blockSize) {
             $halfSize = $blockSize / 2.2;
-            $points = "0," . (-$halfSize) . " " . $halfSize . ",0 0," . $halfSize . " " . (-$halfSize) . ",0";
-            $el = $defs->addChild('polygon');
-            $el->addAttribute('points', $points);
-            return $el;
+
+            $points = implode(' ', [
+                "0,-{$halfSize}",
+                "{$halfSize},0",
+                "0,{$halfSize}",
+                "-{$halfSize},0",
+            ]);
+
+            $diamond = $defs->addChild('polygon');
+            $diamond->addAttribute('points', $points);
+
+            return $diamond;
+
         }, $rowIndex, $colIndex, $baseBlockSize, $foregroundColor);
     }
 
     /**
-     * Renders the SVG shape definition in <defs> or places a <use> reference at the target position
+     * Renders an SVG shape definition or places a <use> reference
+     * at the target position.
      */
     private static function render(
         \SimpleXMLElement $baseImage,
@@ -121,22 +158,28 @@ class SvgShapeDrawer
         $shapeId = 'shape_' . $methodName;
 
         if ($baseImage->getName() === 'defs') {
-            $el = $definitionCallback($baseImage, $blockSize);
-            $el->addAttribute('id', $shapeId);
+            $element = $definitionCallback($baseImage, $blockSize);
 
-            $el->addAttribute('fill', $foregroundColor->getHex());
+            $element->addAttribute('id', $shapeId);
+            $element->addAttribute('fill', $foregroundColor->getHex());
+
             $alpha = 1 - ($foregroundColor->getAlpha() / 127);
-            $el->addAttribute('fill-opacity', (string)min(1, max(0, $alpha)));
 
-        } else {
-            $use = $baseImage->addChild('use');
-            $use->addAttribute('href', '#' . $shapeId);
+            $element->addAttribute(
+                'fill-opacity',
+                (string)min(1, max(0, $alpha))
+            );
 
-            $x = round(($columnIndex * $blockSize) + ($blockSize / 2), 1);
-            $y = round(($rowIndex * $blockSize) + ($blockSize / 2), 1);
-
-            $use->addAttribute('x', (string)$x);
-            $use->addAttribute('y', (string)$y);
+            return;
         }
+
+        $use = $baseImage->addChild('use');
+        $use->addAttribute('href', '#' . $shapeId);
+
+        $x = round(($columnIndex * $blockSize) + ($blockSize / 2), 1);
+        $y = round(($rowIndex * $blockSize) + ($blockSize / 2), 1);
+
+        $use->addAttribute('x', (string)$x);
+        $use->addAttribute('y', (string)$y);
     }
 }

@@ -10,13 +10,16 @@ use Endroid\QrCode\Color\ColorInterface;
  */
 class ImageOverlay
 {
-    private ?string $backgroundPath;
-    private ?string $overlayPath;
+    private string $backgroundPath;
+    private string $overlayPath;
 
     /**
      * Constructor to initialize background and overlay paths
+     *
+     * @param $background
+     * @param $overlay
      */
-    public function __construct($background, $overlay)
+    public function __construct(string $background, string $overlay)
     {
         $this->overlayPath = CursorPaths::getValueByKey($overlay);
         $this->backgroundPath = MarkerPaths::getValueByKey($background);
@@ -92,11 +95,13 @@ class ImageOverlay
 
     /**
      * Creates a centered image by overlaying one image on another
+     *
+     * @param \Endroid\QrCode\Color\ColorInterface|null $color
+     * @return \GdImage
+     * @throws \Exception
      */
     private function createCenteredImage(?ColorInterface $color = null): \GdImage
     {
-        $this->validatePaths();
-
         $background = $this->createImageResource($this->backgroundPath);
         $overlay = $this->createImageResource($this->overlayPath);
 
@@ -107,8 +112,12 @@ class ImageOverlay
 
         $bgWidth = imagesx($background);
         $bgHeight = imagesy($background);
-        $overlayWidth = (int)(imagesx($overlay) / 3.1);
-        $overlayHeight = (int)(imagesy($overlay) / 3.1);
+
+        $overlayOriginalWidth = imagesx($overlay);
+        $overlayOriginalHeight = imagesy($overlay);
+
+        $overlayWidth = (int)($overlayOriginalWidth / 3.1);
+        $overlayHeight = (int)($overlayOriginalHeight / 3.1);
 
         $x = (int)(($bgWidth - $overlayWidth) / 2);
         $y = (int)(($bgHeight - $overlayHeight) / 2);
@@ -120,7 +129,7 @@ class ImageOverlay
             $background, $overlay,
             $x, $y, 0, 0,
             $overlayWidth, $overlayHeight,
-            imagesx($overlay), imagesy($overlay)
+            $overlayOriginalWidth, $overlayOriginalHeight
         );
 
         imagedestroy($overlay);
@@ -130,6 +139,11 @@ class ImageOverlay
 
     /**
      * Helper method to generate base64 image output
+     *
+     * @param bool $uri
+     * @param \Endroid\QrCode\Color\ColorInterface|null $overlayColor
+     * @return string
+     * @throws \Exception
      */
     private function getImageAsBase64(bool $uri = true, ?ColorInterface $overlayColor = null): string
     {
@@ -145,6 +159,10 @@ class ImageOverlay
 
     /**
      * Tints an image with a specific color while preserving transparency
+     *
+     * @param \GdImage $image
+     * @param \Endroid\QrCode\Color\ColorInterface $color
+     * @return \GdImage
      */
     private function recolorImage(\GdImage $image, ColorInterface $color): \GdImage
     {
@@ -155,7 +173,11 @@ class ImageOverlay
         imagealphablending($tinted, false);
         imagesavealpha($tinted, true);
 
-        $newColorIndex = imagecolorallocatealpha(
+        $transparentColor = imagecolorallocatealpha($tinted, 0, 0, 0, 127);
+
+        imagefill($tinted, 0, 0, $transparentColor);
+
+        $newColor = imagecolorallocatealpha(
             $tinted,
             $color->getRed(),
             $color->getGreen(),
@@ -163,26 +185,27 @@ class ImageOverlay
             $color->getAlpha()
         );
 
-        $transparentColor = imagecolorallocatealpha($tinted, 0, 0, 0, 127);
+        for ($y = 0; $y < $height; ++$y) {
+            for ($x = 0; $x < $width; ++$x) {
+                $pixel = imagecolorat($image, $x, $y);
 
-        for ($x = 0; $x < $width; $x++) {
-            for ($y = 0; $y < $height; $y++) {
-                $pixelIndex = imagecolorat($image, $x, $y);
-                $pixelColor = imagecolorsforindex($image, $pixelIndex);
-
-                if ($pixelColor['alpha'] < 127) {
-                    imagesetpixel($tinted, $x, $y, $newColorIndex);
-                } else {
-                    imagesetpixel($tinted, $x, $y, $transparentColor);
+                if ((($pixel >> 24) & 0x7F) < 127) {
+                    imagesetpixel($tinted, $x, $y, $newColor);
                 }
             }
         }
+
+        imagedestroy($image);
 
         return $tinted;
     }
 
     /**
      * Creates an image resource from a file path
+     *
+     * @param string $path
+     * @return \GdImage
+     * @throws \Exception
      */
     private function createImageResource(string $path): \GdImage
     {
@@ -200,16 +223,5 @@ class ImageOverlay
         imagesavealpha($image, true);
 
         return $image;
-    }
-
-    /**
-     * Validates the paths for background and overlay
-     *
-     */
-    private function validatePaths(): void
-    {
-        if (!file_exists($this->backgroundPath) || !file_exists($this->overlayPath)) {
-            throw new \Exception('Invalid file paths for background or overlay images.');
-        }
     }
 }
