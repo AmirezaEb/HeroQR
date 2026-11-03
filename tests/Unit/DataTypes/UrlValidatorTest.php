@@ -120,4 +120,64 @@ class UrlValidatorTest extends TestCase
         $url = '';
         $this->assertFalse(UrlValidator::validate($url), 'Empty URL passed validation');
     }
+
+    /**
+     * Test URL with fragment
+     */
+    #[Test]
+    public function isValidUrlWithFragment(): void
+    {
+        $url = 'https://example.com/page#section';
+        $this->assertTrue(UrlValidator::validate($url), 'Valid URL with fragment failed validation');
+    }
+
+    /**
+     * Test URL with port is rejected by the current URL pattern
+     */
+    #[Test]
+    public function isInvalidUrlWithPort(): void
+    {
+        $url = 'https://example.com:8080/api';
+        $this->assertFalse(UrlValidator::validate($url), 'URL with port should fail current validation pattern');
+    }
+
+    /**
+     * Test HTTP URL
+     */
+    #[Test]
+    public function isValidHttpUrl(): void
+    {
+        $url = 'http://example.com';
+        $this->assertTrue(UrlValidator::validate($url), 'Valid HTTP URL failed validation');
+    }
+
+    /**
+     * Test URL with INSERT SQL keyword
+     */
+    #[Test]
+    public function isInvalidUrlWithInsertKeyword(): void
+    {
+        $url = 'https://example.com/?q=INSERT+INTO';
+        $this->assertFalse(UrlValidator::validate($url), 'URL containing INSERT keyword passed');
+    }
+
+    /**
+     * Test URL with DROP SQL keyword
+     */
+    #[Test]
+    public function isInvalidUrlWithDropKeyword(): void
+    {
+        $url = 'https://example.com/?q=DROP+TABLE';
+        $this->assertFalse(UrlValidator::validate($url), 'URL containing DROP keyword passed');
+    }
+
+    /**
+     * Test that getType returns UrlValidator class
+     */
+    #[Test]
+    public function isGetTypeReturnsUrlValidator(): void
+    {
+        $this->assertSame(UrlValidator::class, UrlValidator::getType());
+    }
 }
+
